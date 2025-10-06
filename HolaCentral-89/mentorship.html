@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ATHENIUM Trading Platform - Mentorship player for professional trading education.">
+    <meta property="og:title" content="ATHENIUM Mentorship Player">
+    <meta property="og:description" content="Professional mentorship player for ATHENIUM trading platform.">
+    <meta property="og:type" content="website">
+    <title>ATHENIUM - Mentorship</title>
+    <style>
+        :root {
+            --color-text: rgba(255, 255, 255, 0.9);
+            --color-bg: #111111;
+            --color-title: rgba(255, 255, 255, 0.95);
+            --color-switch-active: #ffffff;
+        }
+        
+        body {
+            font-family: "TheGoodMonolith", monospace;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            min-height: 100vh;
+        }
+        
+        .mentorship-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .mentorship-header {
+            background: rgba(20, 20, 20, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .mentorship-brand {
+            font-family: "TheGoodMonolith", monospace;
+            font-size: 1.5rem;
+            color: var(--color-title);
+            letter-spacing: 1px;
+        }
+        
+        .back-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--color-text);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-family: "TheGoodMonolith", monospace;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .mentorship-main {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .mentorship-content {
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .mentorship-title {
+            font-family: "TheGoodMonolith", monospace;
+            font-size: 2rem;
+            color: var(--color-title);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        .mentorship-info {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            opacity: 0.8;
+        }
+        
+        .mentorship-type {
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .mentorship-date {
+            font-size: 0.9rem;
+        }
+        
+        .video-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto 2rem auto;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .video-player {
+            width: 100%;
+            height: 450px;
+            border: none;
+        }
+        
+        .mentorship-description {
+            background: rgba(30, 30, 30, 0.6);
+            border-radius: 12px;
+            padding: 1.5rem;
+            line-height: 1.6;
+        }
+        
+        .loading-state {
+            text-align: center;
+            padding: 3rem;
+            opacity: 0.7;
+        }
+        
+        .loading-spinner {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .error-state {
+            text-align: center;
+            padding: 3rem;
+            color: #ef4444;
+        }
+        
+        .error-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .mentorship-main {
+                padding: 1rem;
+            }
+            
+            .mentorship-content {
+                padding: 1rem;
+            }
+            
+            .mentorship-title {
+                font-size: 1.5rem;
+            }
+            
+            .mentorship-info {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .video-player {
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="mentorship-container">
+        <div class="mentorship-header">
+            <div class="mentorship-brand">ATHENIUM</div>
+            <a href="/dashboard" class="back-btn" data-testid="button-back-dashboard">← Back to Dashboard</a>
+        </div>
+        
+        <div class="mentorship-main">
+            <div class="mentorship-content">
+                <div id="loadingState" class="loading-state">
+                    <div class="loading-spinner">🎥</div>
+                    <div>Loading mentorship...</div>
+                </div>
+                
+                <div id="errorState" class="error-state" style="display: none;">
+                    <div class="error-icon">❌</div>
+                    <div>Error loading mentorship</div>
+                    <div style="font-size: 0.9rem; margin-top: 0.5rem; opacity: 0.7;">Mentorship not found or you don't have permission to view it.</div>
+                </div>
+                
+                <div id="mentorshipContent" style="display: none;">
+                    <h1 class="mentorship-title" id="mentorshipTitle">Mentorship Title</h1>
+                    
+                    <div class="mentorship-info">
+                        <div class="mentorship-type" id="mentorshipType">Type</div>
+                        <div class="mentorship-date" id="mentorshipDate">Date</div>
+                    </div>
+                    
+                    <div class="video-container" id="videoContainer">
+                        <!-- Video player will be inserted here -->
+                    </div>
+                    
+                    <div class="mentorship-description" id="mentorshipDescription">
+                        <!-- Description will be inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get mentorship ID from URL
+        const mentorshipId = window.location.pathname.split('/').pop();
+        
+        // Load mentorship data
+        async function loadMentorship() {
+            try {
+                const response = await fetch('/api/global-mentorships');
+                if (response.ok) {
+                    const mentorships = await response.json();
+                    const mentorship = mentorships.find(m => m.id.toString() === mentorshipId);
+                    
+                    if (mentorship) {
+                        displayMentorship(mentorship);
+                    } else {
+                        showError('Mentorship not found');
+                    }
+                } else {
+                    showError('Error loading mentorship');
+                }
+            } catch (error) {
+                console.error('Error loading mentorship:', error);
+                showError('Connection error');
+            }
+        }
+        
+        function displayMentorship(mentorship) {
+            // Hide loading state
+            document.getElementById('loadingState').style.display = 'none';
+            
+            // Show content
+            document.getElementById('mentorshipContent').style.display = 'block';
+            
+            // Set title
+            document.getElementById('mentorshipTitle').textContent = mentorship.title;
+            
+            // Set type
+            const typeElement = document.getElementById('mentorshipType');
+            typeElement.textContent = mentorship.type === 'youtube' ? 'YouTube' : 'Video File';
+            
+            // Set date
+            const dateElement = document.getElementById('mentorshipDate');
+            dateElement.textContent = new Date(mentorship.createdAt).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            // Set description
+            const descriptionElement = document.getElementById('mentorshipDescription');
+            descriptionElement.textContent = mentorship.description || 'No description available.';
+            
+            // Setup video player
+            setupVideoPlayer(mentorship);
+        }
+        
+        function setupVideoPlayer(mentorship) {
+            const videoContainer = document.getElementById('videoContainer');
+            
+            if (mentorship.type === 'youtube' && mentorship.youtubeUrl) {
+                // Extract YouTube video ID from URL
+                const videoId = extractYouTubeId(mentorship.youtubeUrl);
+                if (videoId) {
+                    videoContainer.innerHTML = `
+                        <iframe 
+                            class="video-player"
+                            src="https://www.youtube.com/embed/${videoId}?autoplay=0&rel=0" 
+                            title="${mentorship.title}"
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen
+                            data-testid="youtube-player">
+                        </iframe>
+                    `;
+                } else {
+                    videoContainer.innerHTML = `
+                        <div style="display: flex; align-items: center; justify-content: center; height: 450px; color: #ef4444;">
+                            <div style="text-align: center;">
+                                <div style="font-size: 2rem; margin-bottom: 1rem;">⚠️</div>
+                                <div>Invalid YouTube URL</div>
+                            </div>
+                        </div>
+                    `;
+                }
+            } else if (mentorship.type === 'upload' && mentorship.uploadedVideo) {
+                // Create a functional video player for file mentorships
+                videoContainer.innerHTML = `
+                    <video 
+                        class="video-player"
+                        controls
+                        preload="metadata"
+                        data-testid="file-video-player"
+                        style="width: 100%; height: 450px; background: #000;"
+                        src="/uploads/${mentorship.uploadedVideo}">
+                        <div style="color: white; padding: 2rem; text-align: center;">
+                            <div style="font-size: 2rem; margin-bottom: 1rem;">⚠️</div>
+                            <div>Your browser does not support the video element.</div>
+                            <div style="margin-top: 1rem; font-size: 0.9rem; opacity: 0.7;">
+                                Please update your browser or try a different one.
+                            </div>
+                        </div>
+                    </video>
+                `;
+            } else {
+                videoContainer.innerHTML = `
+                    <div style="display: flex; align-items: center; justify-content: center; height: 450px; color: #ef4444;">
+                        <div style="text-align: center;">
+                            <div style="font-size: 2rem; margin-bottom: 1rem;">❌</div>
+                            <div>Cannot play this mentorship</div>
+                            <div style="font-size: 0.8rem; margin-top: 0.5rem; opacity: 0.7;">Invalid type or URL</div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        function extractYouTubeId(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+        
+        function showError(message) {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('errorState').style.display = 'block';
+            
+            const errorElement = document.getElementById('errorState');
+            const messageElement = errorElement.querySelector('div:nth-child(2)');
+            if (messageElement) {
+                messageElement.textContent = message;
+            }
+        }
+        
+        // Initialize page
+        loadMentorship();
+    </script>
+</body>
+</html>

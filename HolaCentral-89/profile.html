@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ATHENIUM Trading Platform - User profile with detailed trading statistics and performance metrics.">
+    <title>ATHENIUM - User Profile</title>
+    <style>
+        :root {
+            --color-text: rgba(255, 255, 255, 0.9);
+            --color-bg: #111111;
+            --color-title: rgba(255, 255, 255, 0.95);
+            --color-switch-active: #ffffff;
+            --color-success: #22c55e;
+            --color-danger: #ef4444;
+            --color-warning: #f59e0b;
+        }
+        
+        @font-face {
+            font-family: "TheGoodMonolith";
+            font-style: normal;
+            font-weight: 500;
+            src: local("TheGoodMonolith"),
+                url("https://fonts.cdnfonts.com/s/32398/TheGoodMonolith.woff") format("woff");
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: "TheGoodMonolith", monospace;
+            margin: 0;
+            padding: 0;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            min-height: 100vh;
+        }
+        
+        .profile-container {
+            min-height: 100vh;
+            background-color: var(--color-bg);
+        }
+        
+        .profile-header {
+            background: rgba(20, 20, 20, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .back-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--color-text);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-family: "TheGoodMonolith", monospace;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .profile-brand {
+            font-family: "TheGoodMonolith", monospace;
+            font-size: 1.5rem;
+            color: var(--color-title);
+            letter-spacing: 1px;
+        }
+        
+        .profile-main {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .profile-hero {
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+        
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 3px solid var(--color-switch-active);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+        }
+        
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .profile-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .profile-name {
+            font-size: 2rem;
+            color: var(--color-title);
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .share-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--color-text);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-family: "TheGoodMonolith", monospace;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .share-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: var(--color-switch-active);
+        }
+        
+        .share-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+        
+        .profile-id {
+            font-family: "TheGoodMonolith", monospace;
+            font-size: 0.95rem;
+            color: var(--color-switch-active);
+            font-weight: bold;
+            letter-spacing: 1px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+        
+        .joined-date {
+            color: var(--color-text);
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .stat-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        
+        .stat-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--color-switch-active), rgba(255,255,255,0.8));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--color-bg);
+            font-size: 0.9rem;
+        }
+        
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--color-text);
+            opacity: 0.7;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--color-title);
+        }
+        
+        .stat-value.positive {
+            color: var(--color-success);
+        }
+        
+        .stat-value.negative {
+            color: var(--color-danger);
+        }
+        
+        .progress-section {
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .section-title {
+            font-size: 1.2rem;
+            color: var(--color-title);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--color-switch-active), #ffffff);
+            border-radius: 12px;
+            transition: width 1s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 0.75rem;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--color-bg);
+        }
+        
+        .discord-section {
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .discord-connected {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(88, 101, 242, 0.1);
+            border: 1px solid rgba(88, 101, 242, 0.3);
+            border-radius: 8px;
+        }
+        
+        .discord-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #5865F2;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        
+        .discord-not-connected {
+            text-align: center;
+            padding: 2rem;
+            color: var(--color-text);
+            opacity: 0.6;
+        }
+        
+        .trades-section {
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+        
+        .trades-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        .trades-table th,
+        .trades-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+        }
+        
+        .trades-table th {
+            font-weight: bold;
+            opacity: 0.8;
+            color: var(--color-title);
+        }
+        
+        .trade-profit {
+            color: var(--color-success);
+            font-weight: bold;
+        }
+        
+        .trade-loss {
+            color: var(--color-danger);
+            font-weight: bold;
+        }
+        
+        .trade-breakeven {
+            color: var(--color-warning);
+            font-weight: bold;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 2rem;
+            color: var(--color-text);
+            opacity: 0.6;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--color-text);
+            opacity: 0.6;
+        }
+        
+        .error {
+            text-align: center;
+            padding: 3rem;
+            color: var(--color-danger);
+        }
+        
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .profile-header {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .header-left {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .profile-main {
+                padding: 1rem;
+            }
+            
+            .profile-hero {
+                grid-template-columns: 1fr;
+                text-align: center;
+                justify-items: center;
+            }
+            
+            .profile-avatar {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .profile-name {
+                font-size: 1.5rem;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            
+            .share-btn {
+                font-size: 0.8rem;
+                padding: 0.4rem 0.8rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stat-value {
+                font-size: 1.5rem;
+            }
+            
+            .trades-table {
+                font-size: 0.8rem;
+            }
+            
+            .trades-table th,
+            .trades-table td {
+                padding: 0.5rem;
+            }
+            
+            /* Hide some columns on mobile */
+            .trades-table .hide-mobile {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .profile-brand {
+                font-size: 1.2rem;
+            }
+            
+            .stat-value {
+                font-size: 1.3rem;
+            }
+            
+            .section-title {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-container">
+        <header class="profile-header">
+            <div class="header-left">
+                <a href="/dashboard" class="back-btn">
+                    <span>←</span> Back
+                </a>
+                <span class="profile-brand">ATHENIUM</span>
+            </div>
+        </header>
+        
+        <main class="profile-main">
+            <div id="loadingState" class="loading">
+                Loading profile...
+            </div>
+            
+            <div id="errorState" class="error" style="display: none;">
+                <h2>Error loading profile</h2>
+                <p id="errorMessage"></p>
+            </div>
+            
+            <div id="profileContent" style="display: none;">
+                <!-- Profile Hero -->
+                <div class="profile-hero">
+                    <div class="profile-avatar">
+                        <img id="userAvatar" src="/attached_assets/default-avatar.svg" alt="Profile">
+                    </div>
+                    <div class="profile-info">
+                        <h1 class="profile-name">
+                            <span id="userName">Loading...</span>
+                            <button class="share-btn" onclick="shareProfile()" title="Share profile">
+                                <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M18 16.08C17.24 16.08 16.56 16.38 16.04 16.85L8.91 12.7C8.96 12.47 9 12.24 9 12C9 11.76 8.96 11.53 8.91 11.3L15.96 7.19C16.5 7.69 17.21 8 18 8C19.66 8 21 6.66 21 5C21 3.34 19.66 2 18 2C16.34 2 15 3.34 15 5C15 5.24 15.04 5.47 15.09 5.7L8.04 9.81C7.5 9.31 6.79 9 6 9C4.34 9 3 10.34 3 12C3 13.66 4.34 15 6 15C6.79 15 7.5 14.69 8.04 14.19L15.16 18.35C15.11 18.56 15.08 18.78 15.08 19C15.08 20.61 16.39 21.92 18 21.92C19.61 21.92 20.92 20.61 20.92 19C20.92 17.39 19.61 16.08 18 16.08Z"/>
+                                </svg>
+                                Share
+                            </button>
+                        </h1>
+                        <div class="profile-id">
+                            ID: <span id="userId"></span>
+                        </div>
+                        <div class="badge">
+                            <span>📊</span>
+                            <span id="tradingLevel">Beginner Trader</span>
+                        </div>
+                        <div class="joined-date">
+                            Member since <span id="joinedDate"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon">📈</div>
+                            <div class="stat-label">Total Trades</div>
+                        </div>
+                        <div class="stat-value" id="totalTrades">0</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon">🎯</div>
+                            <div class="stat-label">Win Rate</div>
+                        </div>
+                        <div class="stat-value" id="winRate">0%</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon">💰</div>
+                            <div class="stat-label">Monthly P&L</div>
+                        </div>
+                        <div class="stat-value" id="monthlyPL">$0.00</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon">⚖️</div>
+                            <div class="stat-label">Risk/Reward Ratio</div>
+                        </div>
+                        <div class="stat-value" id="riskReward">0.0</div>
+                    </div>
+                </div>
+                
+                <!-- Progress Section -->
+                <div class="progress-section">
+                    <h2 class="section-title">
+                        <span>📊</span>
+                        Training Progress
+                    </h2>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill" style="width: 0%;">
+                            <span id="progressText">0%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Discord Section -->
+                <div class="discord-section">
+                    <h2 class="section-title">
+                        <span>💬</span>
+                        Discord Account
+                    </h2>
+                    <div id="discordContent">
+                        <div class="loading">Checking Discord connection...</div>
+                    </div>
+                </div>
+                
+                <!-- Recent Trades -->
+                <div class="trades-section">
+                    <h2 class="section-title">
+                        <span>📋</span>
+                        Recent Trades
+                    </h2>
+                    <div id="tradesContent">
+                        <div class="loading">Loading trades...</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        // Get user ID from URL
+        const urlPath = window.location.pathname;
+        const userId = urlPath.split('/profile/')[1];
+        
+        if (!userId) {
+            showError('Invalid profile URL');
+        } else {
+            loadProfile(userId);
+        }
+        
+        async function loadProfile(userId) {
+            try {
+                // Fetch user data
+                const userResponse = await fetch(`/api/user/${userId}`);
+                if (!userResponse.ok) throw new Error('User not found');
+                const user = await userResponse.json();
+                
+                // Fetch user stats
+                const statsResponse = await fetch(`/api/user/${userId}/stats`);
+                const stats = await statsResponse.json();
+                
+                // Fetch Discord info
+                const discordResponse = await fetch(`/api/user/${userId}/discord`);
+                const discord = await discordResponse.json();
+                
+                // Fetch trades
+                const tradesResponse = await fetch(`/api/user/${userId}/trades`);
+                const trades = await tradesResponse.json();
+                
+                displayProfile(user, stats, discord, trades);
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                showError(error.message || 'Failed to load profile');
+            }
+        }
+        
+        function displayProfile(user, stats, discord, trades) {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('profileContent').style.display = 'block';
+            
+            // User basic info
+            document.getElementById('userName').textContent = user.email.split('@')[0].toUpperCase();
+            document.getElementById('userId').textContent = user.uniqueId || user.id;
+            document.getElementById('tradingLevel').textContent = (user.tradingLevel || 'beginner').charAt(0).toUpperCase() + (user.tradingLevel || 'beginner').slice(1) + ' Trader';
+            
+            // Avatar
+            const avatar = user.profilePhoto || 'default1';
+            if (avatar.startsWith('custom-')) {
+                document.getElementById('userAvatar').src = `/uploads/${avatar.replace('custom-', '')}`;
+            } else {
+                // Use generated avatar or stock image
+                document.getElementById('userAvatar').src = `/attached_assets/generated_images/${getAvatarImage(avatar)}`;
+            }
+            
+            // Joined date
+            const joinedDate = new Date(user.joinedAt || Date.now());
+            document.getElementById('joinedDate').textContent = joinedDate.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            
+            // Stats
+            document.getElementById('totalTrades').textContent = stats.totalTrades || 0;
+            const winRate = stats.successRate || 0;
+            const winRateEl = document.getElementById('winRate');
+            winRateEl.textContent = winRate + '%';
+            winRateEl.className = 'stat-value ' + (winRate >= 50 ? 'positive' : '');
+            
+            const pnl = parseFloat(stats.monthlyPL || 0);
+            const pnlEl = document.getElementById('monthlyPL');
+            pnlEl.textContent = '$' + pnl.toFixed(2);
+            pnlEl.className = 'stat-value ' + (pnl >= 0 ? 'positive' : 'negative');
+            
+            document.getElementById('riskReward').textContent = stats.riskRewardRatio || '0.0';
+            
+            // Progress
+            const progress = parseFloat(user.progress || 0);
+            setTimeout(() => {
+                document.getElementById('progressFill').style.width = progress + '%';
+                document.getElementById('progressText').textContent = progress.toFixed(1) + '%';
+            }, 300);
+            
+            // Discord
+            displayDiscord(discord);
+            
+            // Trades
+            displayTrades(trades);
+        }
+        
+        function getAvatarImage(avatar) {
+            const avatarMap = {
+                'default1': 'Cyan_diamond_trading_avatar_399583d3.png',
+                'default2': 'Golden_bull_trading_avatar_d0599921.png',
+                'default3': 'Green_arrow_trading_avatar_e15f5bcf.png',
+                'default4': 'Orange_mountain_trading_avatar_e1ac3308.png',
+                'default5': 'Silver_bear_trading_avatar_c481d929.png',
+            };
+            return avatarMap[avatar] || avatarMap['default1'];
+        }
+        
+        function displayDiscord(discord) {
+            const content = document.getElementById('discordContent');
+            
+            if (discord.linked) {
+                content.innerHTML = `
+                    <div class="discord-connected">
+                        <div class="discord-avatar">D</div>
+                        <div>
+                            <div style="font-weight: bold; margin-bottom: 0.25rem;">${discord.discordUsername}</div>
+                            <div style="font-size: 0.85rem; opacity: 0.7;">Linked ${new Date(discord.linkedAt).toLocaleDateString()}</div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                content.innerHTML = `
+                    <div class="discord-not-connected">
+                        <p>Discord account not linked</p>
+                    </div>
+                `;
+            }
+        }
+        
+        function displayTrades(trades) {
+            const content = document.getElementById('tradesContent');
+            
+            if (!trades || trades.length === 0) {
+                content.innerHTML = '<div class="no-data">No trades recorded yet</div>';
+                return;
+            }
+            
+            const tableHTML = `
+                <table class="trades-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Ticker</th>
+                            <th>Type</th>
+                            <th>Amount</th>
+                            <th class="hide-mobile">Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${trades.map(trade => {
+                            const date = new Date(trade.entryDate);
+                            const tradeClass = trade.tradeType === 'profit' ? 'trade-profit' : 
+                                             trade.tradeType === 'loss' ? 'trade-loss' : 'trade-breakeven';
+                            const amount = parseFloat(trade.amount);
+                            const sign = amount >= 0 ? '+' : '';
+                            
+                            return `
+                                <tr>
+                                    <td>${date.toLocaleDateString()}</td>
+                                    <td><strong>${trade.ticker}</strong></td>
+                                    <td><span class="${tradeClass}">${trade.tradeType.toUpperCase()}</span></td>
+                                    <td class="${tradeClass}">${sign}$${Math.abs(amount).toFixed(2)}</td>
+                                    <td class="hide-mobile">${trade.notes || '-'}</td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            `;
+            
+            content.innerHTML = tableHTML;
+        }
+        
+        function showError(message) {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('errorState').style.display = 'block';
+            document.getElementById('errorMessage').textContent = message;
+        }
+        
+        function shareProfile() {
+            const profileUrl = window.location.href;
+            
+            // Try to use the Web Share API if available (mobile devices)
+            if (navigator.share) {
+                navigator.share({
+                    title: 'ATHENIUM Trader Profile',
+                    text: 'Check out my trading profile on ATHENIUM',
+                    url: profileUrl
+                }).catch(err => {
+                    // If sharing fails, fallback to copying
+                    copyProfileLink(profileUrl);
+                });
+            } else {
+                // Fallback to copying the link
+                copyProfileLink(profileUrl);
+            }
+        }
+        
+        function copyProfileLink(url) {
+            navigator.clipboard.writeText(url).then(() => {
+                // Visual feedback
+                const shareBtn = document.querySelector('.share-btn');
+                const originalHTML = shareBtn.innerHTML;
+                
+                shareBtn.innerHTML = `
+                    <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                    </svg>
+                    Copied!
+                `;
+                
+                setTimeout(() => {
+                    shareBtn.innerHTML = originalHTML;
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                alert('Failed to copy link');
+            });
+        }
+    </script>
+</body>
+</html>

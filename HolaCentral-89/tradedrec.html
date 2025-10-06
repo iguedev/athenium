@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ATHENIUM Trading Platform - Trade Records Management and Tracking">
+    <meta property="og:title" content="ATHENIUM Trade Records">
+    <meta property="og:description" content="Manage and track all your trading activities in one unified platform.">
+    <meta property="og:type" content="website">
+    <title>ATHENIUM - Trade Records</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        :root {
+            --color-text: rgba(255, 255, 255, 0.9);
+            --color-bg: #111111;
+            --color-title: rgba(255, 255, 255, 0.95);
+            --color-switch-active: #ffffff;
+        }
+
+        body {
+            font-family: "TheGoodMonolith", monospace;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .tradedrec-container {
+            min-height: 100vh;
+            height: 100vh;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .tradedrec-header {
+            background: rgba(20, 20, 20, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .tradedrec-brand {
+            font-family: "TheGoodMonolith", monospace;
+            font-size: 1.5rem;
+            color: var(--color-title);
+            letter-spacing: 1px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            flex: 1;
+            overflow-y: auto;
+            height: calc(100vh - 80px);
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .page-header h1 {
+            font-family: "TheGoodMonolith", monospace;
+            font-size: 2.5rem;
+            color: var(--color-title);
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header p {
+            color: var(--color-text);
+            opacity: 0.7;
+            font-size: 1.1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: rgba(20, 20, 20, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            background: rgba(25, 25, 25, 0.9);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-card h3 {
+            color: var(--color-title);
+            font-size: 2rem;
+            font-family: "TheGoodMonolith", monospace;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card p {
+            color: var(--color-text);
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+
+        .section-card {
+            background: rgba(20, 20, 20, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            color: var(--color-title);
+            font-family: "TheGoodMonolith", monospace;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            color: var(--color-text);
+            margin-bottom: 0.5rem;
+            font-family: "TheGoodMonolith", monospace;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            background: rgba(30, 30, 30, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            padding: 0.75rem;
+            color: var(--color-text);
+            font-family: "TheGoodMonolith", monospace;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(35, 35, 35, 0.9);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--color-text);
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-family: "TheGoodMonolith", monospace;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background: rgba(220, 38, 38, 0.2);
+            border-color: rgba(220, 38, 38, 0.3);
+            color: #ef4444;
+        }
+
+        .btn-danger:hover {
+            background: rgba(220, 38, 38, 0.3);
+        }
+
+        .trades-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        .trades-table-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+        }
+        
+        .trades-table-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .trades-table-container::-webkit-scrollbar-track {
+            background: rgba(20, 20, 20, 0.8);
+            border-radius: 4px;
+        }
+        
+        .trades-table-container::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+        
+        .trades-table-container::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .trades-table th,
+        .trades-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .trades-table th {
+            background: rgba(25, 25, 25, 0.8);
+            color: var(--color-title);
+            font-family: "TheGoodMonolith", monospace;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .trades-table tr:hover {
+            background: rgba(25, 25, 25, 0.5);
+        }
+
+        .trades-table td {
+            font-family: "TheGoodMonolith", monospace;
+            color: var(--color-text);
+        }
+
+        .trade-type {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .trade-type.profit {
+            background: #10b981;
+            color: #ffffff;
+        }
+
+        .trade-type.loss {
+            background: #ef4444;
+            color: #ffffff;
+        }
+
+        .trade-type.breakeven {
+            background: #6b7280;
+            color: #ffffff;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #ccc;
+        }
+
+        .error {
+            background: #dc2626;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .success {
+            background: #10b981;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .nav-bar {
+            background: rgba(20, 20, 20, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            padding: 1rem 0;
+            margin-bottom: 2rem;
+        }
+
+        .nav-bar ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-bar a {
+            color: var(--color-text);
+            text-decoration: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-family: "TheGoodMonolith", monospace;
+            transition: all 0.3s ease;
+            opacity: 0.8;
+        }
+
+        .nav-bar a:hover,
+        .nav-bar a.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--color-title);
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .nav-bar ul {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .trades-table {
+                font-size: 0.9rem;
+            }
+            
+            .trades-table th,
+            .trades-table td {
+                padding: 10px 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="tradedrec-container">
+        <!-- Header -->
+        <div class="tradedrec-header">
+            <div class="tradedrec-brand">ATHENIUM</div>
+            <div class="nav-links">
+                <a href="/dashboard" style="margin-right: 1rem; color: var(--color-text); text-decoration: none;">Dashboard</a>
+                <a href="/logout" style="color: var(--color-text); text-decoration: none;">Logout</a>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- Header -->
+            <div class="page-header">
+                <h1>Trade Records</h1>
+                <p>Manage and track all your trading activities in one unified place</p>
+            </div>
+
+        <!-- Statistics -->
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <h3 id="totalTrades">-</h3>
+                <p>Total Trades</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="winRate">-</h3>
+                <p>Win Rate</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="totalPL">-</h3>
+                <p>Total P&L</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="avgTrade">-</h3>
+                <p>Avg Trade</p>
+            </div>
+        </div>
+
+            <!-- Add Trade Section -->
+            <div class="section-card">
+                <h2 class="section-title">Add New Trade</h2>
+            <div id="message"></div>
+            <form id="addTradeForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="ticker">Ticker/Symbol *</label>
+                        <input type="text" id="ticker" name="ticker" placeholder="e.g., EURUSD, AAPL, BTC" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="tradeType">Trade Result *</label>
+                        <select id="tradeType" name="tradeType" required>
+                            <option value="">Select result...</option>
+                            <option value="profit">Profit</option>
+                            <option value="loss">Loss</option>
+                            <option value="breakeven">Breakeven</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="amount">Amount (P&L) *</label>
+                        <input type="number" id="amount" name="amount" step="0.01" placeholder="100.50 or -50.25" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="notes">Notes (Optional)</label>
+                    <textarea id="notes" name="notes" placeholder="Additional notes about this trade..."></textarea>
+                </div>
+                <button type="submit" class="btn">Add Trade</button>
+            </form>
+            </div>
+
+            <!-- Trades List -->
+            <div class="section-card">
+                <h2 class="section-title">Your Trade History</h2>
+            <p style="color: #ccc; margin-bottom: 20px;">All trades from Discord and web interface are displayed here</p>
+            
+            <div id="tradesLoading" class="loading">
+                Loading trades...
+            </div>
+            
+            <div id="tradesContainer" style="display: none;">
+                <div class="trades-table-container">
+                    <table class="trades-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Ticker</th>
+                                <th>Type</th>
+                                <th>Amount</th>
+                                <th>Notes</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tradesTableBody">
+                            <!-- Trades will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div id="noTrades" style="display: none; text-align: center; padding: 40px; color: #ccc;">
+                <p>No trades found. Add your first trade above or use the Discord bot with /journal command!</p>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let trades = [];
+
+        // Load trades when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTrades();
+        });
+
+        // Add trade form submission
+        document.getElementById('addTradeForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const tradeData = {
+                ticker: formData.get('ticker'),
+                tradeType: formData.get('tradeType'),
+                amount: formData.get('amount'),
+                notes: formData.get('notes')
+            };
+
+            try {
+                const response = await fetch('/api/trades', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(tradeData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showMessage('Trade added successfully!', 'success');
+                    e.target.reset();
+                    loadTrades(); // Reload trades list
+                } else {
+                    showMessage(result.error || 'Error adding trade', 'error');
+                }
+            } catch (error) {
+                console.error('Error adding trade:', error);
+                showMessage('Error adding trade. Please try again.', 'error');
+            }
+        });
+
+        // Load trades from API
+        async function loadTrades() {
+            try {
+                const response = await fetch('/api/trades');
+                
+                if (response.status === 401) {
+                    window.location.href = '/auth';
+                    return;
+                }
+                
+                const tradesData = await response.json();
+                trades = tradesData;
+                
+                document.getElementById('tradesLoading').style.display = 'none';
+                
+                if (trades.length === 0) {
+                    document.getElementById('noTrades').style.display = 'block';
+                    document.getElementById('tradesContainer').style.display = 'none';
+                } else {
+                    document.getElementById('noTrades').style.display = 'none';
+                    document.getElementById('tradesContainer').style.display = 'block';
+                    renderTrades();
+                }
+                
+                updateStats();
+                
+            } catch (error) {
+                console.error('Error loading trades:', error);
+                document.getElementById('tradesLoading').innerHTML = 'Error loading trades';
+            }
+        }
+
+        // Render trades in table
+        function renderTrades() {
+            const tbody = document.getElementById('tradesTableBody');
+            tbody.innerHTML = '';
+
+            trades.forEach(trade => {
+                const row = document.createElement('tr');
+                const date = new Date(trade.entryDate).toLocaleDateString();
+                const time = new Date(trade.entryDate).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                
+                row.innerHTML = `
+                    <td>${date}<br><small style="color: #888">${time}</small></td>
+                    <td><strong>${trade.ticker}</strong></td>
+                    <td><span class="trade-type ${trade.tradeType}">${trade.tradeType}</span></td>
+                    <td style="color: ${trade.tradeType === 'profit' ? '#10b981' : trade.tradeType === 'loss' ? '#ef4444' : '#6b7280'}">
+                        ${parseFloat(trade.amount) >= 0 ? '+' : ''}${trade.amount}
+                    </td>
+                    <td>${trade.notes || '-'}</td>
+                    <td>
+                        <button class="btn btn-danger" style="padding: 5px 10px; font-size: 0.8rem;" onclick="deleteTrade(${trade.id})">
+                            Delete
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Delete trade
+        async function deleteTrade(tradeId) {
+            if (!confirm('Are you sure you want to delete this trade?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/trades/${tradeId}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showMessage('Trade deleted successfully!', 'success');
+                    loadTrades(); // Reload trades list
+                } else {
+                    showMessage(result.error || 'Error deleting trade', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting trade:', error);
+                showMessage('Error deleting trade. Please try again.', 'error');
+            }
+        }
+
+        // Update statistics
+        function updateStats() {
+            const totalTrades = trades.length;
+            const profitTrades = trades.filter(t => t.tradeType === 'profit').length;
+            const winRate = totalTrades > 0 ? ((profitTrades / totalTrades) * 100).toFixed(1) : 0;
+            const totalPL = trades.reduce((sum, trade) => sum + parseFloat(trade.amount), 0);
+            const avgTrade = totalTrades > 0 ? (totalPL / totalTrades).toFixed(2) : 0;
+
+            document.getElementById('totalTrades').textContent = totalTrades;
+            document.getElementById('winRate').textContent = winRate + '%';
+            document.getElementById('totalPL').textContent = (totalPL >= 0 ? '+' : '') + totalPL.toFixed(2);
+            document.getElementById('avgTrade').textContent = (avgTrade >= 0 ? '+' : '') + avgTrade;
+            
+            // Color coding for P&L
+            const totalPLElement = document.getElementById('totalPL');
+            totalPLElement.style.color = totalPL >= 0 ? '#10b981' : '#ef4444';
+            
+            const avgTradeElement = document.getElementById('avgTrade');
+            avgTradeElement.style.color = avgTrade >= 0 ? '#10b981' : '#ef4444';
+        }
+
+        // Show message
+        function showMessage(message, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = `<div class="${type}">${message}</div>`;
+            setTimeout(() => {
+                messageDiv.innerHTML = '';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

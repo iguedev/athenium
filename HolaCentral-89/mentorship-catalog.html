@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATHENIUM - Mentorship Catalog</title>
+    <meta name="description" content="Explore all available mentorships on ATHENIUM Trading Platform - Educational videos and premium content for professional traders.">
+    <style>
+        :root {
+            --color-text: rgba(255, 255, 255, 0.9);
+            --color-bg: #111111;
+            --color-title: rgba(255, 255, 255, 0.95);
+            --color-switch-active: #ffffff;
+        }
+        
+        body {
+            font-family: "TheGoodMonolith", monospace;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            min-height: 100vh;
+        }
+        
+        .catalog-container {
+            min-height: 100vh;
+        }
+        
+        .catalog-header {
+            background: rgba(20, 20, 20, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .catalog-brand {
+            font-family: "TheGoodMonolith", monospace;
+            font-size: 1.5rem;
+            color: var(--color-title);
+            letter-spacing: 1px;
+        }
+        
+        .catalog-nav {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .nav-link {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--color-text);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-family: "TheGoodMonolith", monospace;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+        
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--color-switch-active);
+        }
+        
+        .catalog-main {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .catalog-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .catalog-title h1 {
+            font-family: "TheGoodMonolith", monospace;
+            font-size: 3rem;
+            color: var(--color-title);
+            margin-bottom: 0.5rem;
+            letter-spacing: 2px;
+        }
+        
+        .catalog-title p {
+            color: var(--color-text);
+            opacity: 0.8;
+            font-size: 1.2rem;
+        }
+        
+        .mentorships-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .mentorship-card {
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .mentorship-card:hover {
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .mentorship-thumbnail {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, rgba(30,30,30,0.9), rgba(50,50,50,0.6));
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .mentorship-thumbnail.youtube {
+            background: linear-gradient(135deg, rgba(30,30,30,0.9), rgba(50,50,50,0.6));
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        
+        .mentorship-thumbnail.upload {
+            background: linear-gradient(135deg, rgba(30,30,30,0.9), rgba(50,50,50,0.6)), url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiBmaWxsPSIjMjAyMDIwIi8+CjxwYXRoIGQ9Ik0xNiAyMEg0OEMzMCAxNiAzMiAzMiAzMiAzMlY0NEgxNlYyMFoiIGZpbGw9IiM0MDQwNDAiLz4KPHBhdGggZD0iTTIwIDM2TDI4IDI4TDM2IDM2SDIwWiIgZmlsbD0iIzZBNkE2QSIvPgo8cGF0aCBkPSJNMjQgNDRIMTZWMzJIMjRWNDRaIiBmaWxsPSIjODA4MDgwIi8+Cjwvc3ZnPgo=') center/cover;
+        }
+        
+        .play-button {
+            background: rgba(255,255,255,0.9);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+        
+        .play-button:hover {
+            background: rgba(255,255,255,1);
+            transform: scale(1.1);
+        }
+        
+        .mentorship-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .mentorship-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--color-title);
+            margin: 0;
+        }
+        
+        .mentorship-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .mentorship-type {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .type-youtube {
+            background: rgba(255, 0, 0, 0.2);
+            color: #ff4444;
+            border: 1px solid rgba(255, 0, 0, 0.3);
+        }
+        
+        .type-upload {
+            background: rgba(0, 150, 255, 0.2);
+            color: #4da6ff;
+            border: 1px solid rgba(0, 150, 255, 0.3);
+        }
+        
+        .mentorship-description {
+            color: var(--color-text);
+            opacity: 0.9;
+            line-height: 1.5;
+            margin-top: 0.5rem;
+        }
+        
+        .loading-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--color-text);
+            opacity: 0.7;
+        }
+        
+        .error-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #ff4444;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--color-text);
+            opacity: 0.7;
+        }
+        
+        .back-button {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--color-text);
+            padding: 1rem;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+        
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+        
+        @media (max-width: 768px) {
+            .catalog-main {
+                padding: 1rem;
+            }
+            
+            .catalog-title h1 {
+                font-size: 2rem;
+            }
+            
+            .mentorships-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .catalog-header {
+                padding: 1rem;
+            }
+            
+            .catalog-nav {
+                gap: 0.5rem;
+            }
+            
+            .nav-link {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="catalog-container">
+        <header class="catalog-header">
+            <div class="catalog-brand">ATHENIUM</div>
+            <nav class="catalog-nav">
+                <a href="/dashboard" class="nav-link" data-testid="link-back-dashboard">← Dashboard</a>
+                <a href="/mentorship" class="nav-link" data-testid="link-mentorship-page">Main Mentorship</a>
+            </nav>
+        </header>
+        
+        <main class="catalog-main">
+            <div class="catalog-title">
+                <h1>{{ MENTORSHIP CATALOG }}</h1>
+                <p>Explore all educational content available for professional traders</p>
+            </div>
+            
+            <div id="mentorshipsContainer">
+                <div class="loading-state">
+                    <p>Loading mentorships...</p>
+                </div>
+            </div>
+        </main>
+        
+        <button class="back-button" onclick="goBack()" data-testid="button-back">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 12H5M12 19L5 12L12 5"/>
+            </svg>
+        </button>
+    </div>
+    
+    <script>
+        // Load all mentorships
+        async function loadAllMentorships() {
+            try {
+                const response = await fetch('/api/global-mentorships');
+                if (response.ok) {
+                    const mentorships = await response.json();
+                    displayMentorships(mentorships);
+                } else {
+                    showError('Error loading mentorships');
+                }
+            } catch (error) {
+                console.error('Error loading mentorships:', error);
+                showError('Connection error while loading mentorships');
+            }
+        }
+        
+        function displayMentorships(mentorships) {
+            const container = document.getElementById('mentorshipsContainer');
+            
+            if (mentorships.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No mentorships available</h3>
+                        <p>Stay tuned for future updates</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const mentorshipsGrid = document.createElement('div');
+            mentorshipsGrid.className = 'mentorships-grid';
+            
+            mentorships.forEach(mentorship => {
+                const typeText = mentorship.type === 'youtube' ? 'YouTube' : 'Video';
+                const typeClass = mentorship.type === 'youtube' ? 'type-youtube' : 'type-upload';
+                const thumbnailClass = mentorship.type === 'youtube' ? 'youtube' : 'upload';
+                
+                const card = document.createElement('div');
+                card.className = 'mentorship-card';
+                card.setAttribute('data-testid', `card-mentorship-${mentorship.id}`);
+                card.onclick = () => playMentorship(mentorship.id, mentorship.type, mentorship.youtubeUrl, mentorship.uploadedVideo);
+                
+                // Create thumbnail
+                const thumbnail = document.createElement('div');
+                thumbnail.className = `mentorship-thumbnail ${thumbnailClass}`;
+                
+                // Set background image for YouTube videos
+                if (mentorship.type === 'youtube' && mentorship.youtubeUrl) {
+                    // Extract YouTube video ID for thumbnail
+                    const youtubeRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+                    const match = mentorship.youtubeUrl.match(youtubeRegex);
+                    if (match && match[1]) {
+                        const videoId = match[1];
+                        const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+                        thumbnail.style.backgroundImage = `linear-gradient(135deg, rgba(30,30,30,0.7), rgba(50,50,50,0.5)), url('${thumbnailUrl}')`;
+                        thumbnail.style.backgroundSize = 'cover';
+                        thumbnail.style.backgroundPosition = 'center';
+                    }
+                }
+                
+                const playButton = document.createElement('div');
+                playButton.className = 'play-button';
+                playButton.innerHTML = `
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="rgba(0,0,0,0.8)">
+                        <path d="M8,5.14V19.14L19,12.14L8,5.14Z"/>
+                    </svg>
+                `;
+                thumbnail.appendChild(playButton);
+                
+                // Create info section
+                const info = document.createElement('div');
+                info.className = 'mentorship-info';
+                
+                // Title (safe)
+                const title = document.createElement('h3');
+                title.className = 'mentorship-title';
+                title.textContent = mentorship.title;
+                
+                // Meta section
+                const meta = document.createElement('div');
+                meta.className = 'mentorship-meta';
+                
+                const typeSpan = document.createElement('span');
+                typeSpan.className = `mentorship-type ${typeClass}`;
+                typeSpan.textContent = typeText;
+                
+                const dateSpan = document.createElement('span');
+                dateSpan.textContent = new Date(mentorship.createdAt).toLocaleDateString('en-US');
+                
+                meta.appendChild(typeSpan);
+                meta.appendChild(dateSpan);
+                
+                // Description (safe)
+                const description = document.createElement('div');
+                description.className = 'mentorship-description';
+                description.textContent = mentorship.description || 'High-quality educational content to improve your trading skills.';
+                
+                // Assemble card
+                info.appendChild(title);
+                info.appendChild(meta);
+                info.appendChild(description);
+                
+                card.appendChild(thumbnail);
+                card.appendChild(info);
+                
+                mentorshipsGrid.appendChild(card);
+            });
+            
+            container.innerHTML = '';
+            container.appendChild(mentorshipsGrid);
+        }
+        
+        function showError(message) {
+            const container = document.getElementById('mentorshipsContainer');
+            container.innerHTML = `
+                <div class="error-state">
+                    <h3>Error</h3>
+                    <p>${message}</p>
+                    <button onclick="loadAllMentorships()" class="nav-link" style="margin-top: 1rem;">
+                        Retry
+                    </button>
+                </div>
+            `;
+        }
+        
+        function playMentorship(id, type, youtubeUrl, filename) {
+            if (type === 'youtube' && youtubeUrl) {
+                // Open YouTube video in new tab
+                window.open(youtubeUrl, '_blank');
+            } else if (type === 'upload' && filename) {
+                // Navigate to custom video player page with proper ID-based URL
+                window.location.href = `/mentorship/${id}`;
+            } else {
+                alert('Cannot play this mentorship');
+            }
+        }
+        
+        function goBack() {
+            if (document.referrer && document.referrer.includes('/dashboard')) {
+                window.history.back();
+            } else {
+                window.location.href = '/dashboard';
+            }
+        }
+        
+        // Load mentorships when page loads
+        document.addEventListener('DOMContentLoaded', loadAllMentorships);
+    </script>
+</body>
+</html>
