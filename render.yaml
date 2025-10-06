@@ -1,0 +1,25 @@
+services:
+  # Web Service - ATHENIUM Trading Platform
+  - type: web
+    name: athenium-trading
+    runtime: node
+    env: node
+    buildCommand: "./build.sh"
+    startCommand: "npm start"
+    envVars:
+      - key: NODE_VERSION
+        value: 20.19.3
+      - key: DATABASE_URL
+        sync: false  # Must be set manually in Render dashboard
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: NODE_ENV
+        value: production
+    healthCheckPath: /
+    autoDeploy: true
+
+databases:
+  # PostgreSQL Database
+  - name: athenium-db
+    databaseName: athenium
+    user: athenium
