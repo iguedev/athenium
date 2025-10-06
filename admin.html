@@ -1,0 +1,2035 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ATHENIUM Trading Platform - Panel de administración profesional para gestión de usuarios, archivos y configuración del sistema.">
+    <meta property="og:title" content="ATHENIUM Admin Panel">
+    <meta property="og:description" content="Panel de administración profesional para plataforma de trading con gestión completa de usuarios y recursos.">
+    <meta property="og:type" content="website">
+    <title>ATHENIUM - Panel de Administración</title>
+    <style>
+        :root {
+            --color-text: rgba(255, 255, 255, 0.9);
+            --color-bg: #111111;
+            --color-title: rgba(255, 255, 255, 0.95);
+            --color-switch-active: #ffffff;
+        }
+        
+        body {
+            font-family: "TheGoodMonolith", monospace;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        .admin-container {
+            min-height: 100vh;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+        }
+        
+        .admin-header {
+            background: rgba(20, 20, 20, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .admin-brand {
+            font-family: "TheGoodMonolith", monospace;
+            font-size: 1.5rem;
+            color: var(--color-title);
+            letter-spacing: 1px;
+        }
+        
+        .admin-nav {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .nav-link {
+            color: var(--color-text);
+            text-decoration: none;
+            font-family: "TheGoodMonolith", monospace;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            opacity: 0.8;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--color-text);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-family: "TheGoodMonolith", monospace;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .admin-main {
+            padding: 1rem;
+            height: calc(100vh - 80px);
+            overflow-y: auto;
+        }
+        
+        .admin-section {
+            margin-bottom: 3rem;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .section-title {
+            font-family: "TheGoodMonolith", monospace;
+            font-size: 1.8rem;
+            color: var(--color-title);
+            margin: 0;
+        }
+        
+        .add-btn {
+            background: var(--color-switch-active);
+            color: var(--color-bg);
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 8px;
+            font-family: "TheGoodMonolith", monospace;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+        
+        .add-btn:hover {
+            background: #ffffff;
+            transform: translateY(-2px);
+        }
+        
+        .admin-card {
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .admin-card:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .users-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .user-card {
+            background: rgba(30, 30, 30, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .user-card:hover {
+            border-color: var(--color-switch-active);
+            transform: translateY(-3px);
+        }
+        
+        .user-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .user-photo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--color-bg);
+        }
+        
+        .user-info h3 {
+            font-family: "TheGoodMonolith", monospace;
+            color: var(--color-title);
+            margin: 0 0 0.3rem 0;
+            font-size: 1.1rem;
+        }
+        
+        .user-id {
+            font-family: "TheGoodMonolith", monospace;
+            color: var(--color-switch-active);
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        
+        .user-progress {
+            margin: 1rem 0;
+        }
+        
+        .progress-label {
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.8;
+        }
+        
+        .progress-bar-small {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .progress-fill-small {
+            height: 100%;
+            background: linear-gradient(90deg, var(--color-switch-active), #ffffff);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+        
+        .user-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .action-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--color-text);
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-family: "TheGoodMonolith", monospace;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+        }
+        
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .action-btn.primary {
+            background: var(--color-switch-active);
+            color: var(--color-bg);
+        }
+        
+        .action-btn.primary:hover {
+            background: #ffffff;
+        }
+        
+        .resources-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        .resources-table th,
+        .resources-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .resources-table th {
+            font-family: "TheGoodMonolith", monospace;
+            color: var(--color-title);
+            background: rgba(255, 255, 255, 0.05);
+            font-weight: bold;
+        }
+        
+        .resources-table td {
+            color: var(--color-text);
+        }
+        
+        .resources-table tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: rgba(20, 20, 20, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-title {
+            font-family: "TheGoodMonolith", monospace;
+            color: var(--color-title);
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            font-family: "TheGoodMonolith", monospace;
+            color: var(--color-text);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 0.8rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: var(--color-text);
+            font-family: "TheGoodMonolith", monospace;
+            font-size: 0.9rem;
+        }
+        
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--color-switch-active);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        
+        .modal-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--color-text);
+            padding: 0.7rem 1.5rem;
+            border-radius: 8px;
+            font-family: "TheGoodMonolith", monospace;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .modal-btn.primary {
+            background: var(--color-switch-active);
+            color: var(--color-bg);
+        }
+        
+        .modal-btn.primary:hover {
+            background: #ffffff;
+        }
+        
+        .photo-options {
+            display: flex;
+            gap: 0.8rem;
+            justify-content: center;
+            margin: 1rem 0;
+        }
+        
+        .photo-option-admin {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--color-bg);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .photo-option-admin[data-photo^="stock"] {
+            color: transparent;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .photo-option-admin:hover {
+            transform: scale(1.1);
+            border-color: var(--color-switch-active);
+        }
+        
+        .photo-option-admin.selected {
+            border-color: var(--color-switch-active);
+            transform: scale(1.1);
+        }
+        
+        /* Animated Profile photo classes same as dashboard */
+        .default1 { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #667eea 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 3s ease-in-out infinite;
+        }
+        .default2 { 
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #f093fb 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 3.5s ease-in-out infinite;
+        }
+        .default3 { 
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 50%, #4facfe 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 4s ease-in-out infinite;
+        }
+        .default4 { 
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 50%, #43e97b 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 2.5s ease-in-out infinite;
+        }
+        .default5 { 
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 50%, #fa709a 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 3.2s ease-in-out infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        /* Floating animation for admin profile photos */
+        .user-photo, .photo-option-admin {
+            animation: floatProfile 6s ease-in-out infinite;
+        }
+
+        @keyframes floatProfile {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-4px); }
+        }
+
+        /* Admin Dashboard Stats */
+        .admin-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .admin-stat-card {
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .admin-stat-card:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .admin-stat-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--color-switch-active);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem auto;
+            font-size: 1.5rem;
+            color: var(--color-bg);
+        }
+
+        .admin-stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--color-switch-active);
+            margin-bottom: 0.5rem;
+            font-family: "TheGoodMonolith", monospace;
+        }
+
+        .admin-stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            color: var(--color-text);
+        }
+
+        .admin-stat-sublabel {
+            font-size: 0.8rem;
+            opacity: 0.6;
+            color: var(--color-text);
+            margin-top: 0.3rem;
+        }
+
+        /* Admin Tabs System */
+        .admin-tabs {
+            margin-bottom: 2rem;
+        }
+
+        .admin-tabs-list {
+            display: flex;
+            background: rgba(20, 20, 20, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 0.3rem;
+            max-width: 500px;
+            margin: 0 auto 2rem auto;
+        }
+
+        .admin-tab-trigger {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--color-text);
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            font-family: "TheGoodMonolith", monospace;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+
+        .admin-tab-trigger:hover {
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .admin-tab-trigger.active {
+            background: var(--color-switch-active);
+            color: var(--color-bg);
+            opacity: 1;
+        }
+
+        .admin-tab-content {
+            display: none;
+        }
+
+        .admin-tab-content.active {
+            display: block;
+        }
+
+        /* Search Functionality */
+        .search-container {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.8rem 1rem 0.8rem 2.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: var(--color-text);
+            font-family: "TheGoodMonolith", monospace;
+            font-size: 0.9rem;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--color-switch-active);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.8rem;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0.6;
+            font-size: 1rem;
+        }
+
+        /* Improved Table Styles */
+        .enhanced-table {
+            background: rgba(20, 20, 20, 0.4);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .enhanced-table .resources-table th {
+            background: rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            padding: 1.2rem;
+        }
+
+        .enhanced-table .resources-table td {
+            padding: 1.2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .admin-header {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .admin-main {
+                padding: 0.5rem;
+                height: calc(100vh - 120px);
+            }
+            
+            .admin-stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+            
+            .admin-tabs-list {
+                max-width: 100%;
+            }
+            
+            .admin-tab-trigger {
+                font-size: 0.8rem;
+                padding: 0.6rem 0.8rem;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+            
+            /* Mobile table responsiveness */
+            .enhanced-table {
+                overflow-x: auto;
+            }
+            
+            .resources-table {
+                min-width: 800px;
+            }
+            
+            .resources-table th,
+            .resources-table td {
+                padding: 0.5rem;
+                font-size: 0.8rem;
+            }
+            
+            .admin-card {
+                padding: 1rem;
+            }
+            
+            .search-input {
+                font-size: 0.9rem;
+            }
+            
+            .admin-stat-card {
+                padding: 1rem;
+            }
+            
+            .admin-stat-value {
+                font-size: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .admin-header {
+                padding: 0.75rem;
+            }
+            
+            .admin-main {
+                padding: 0.25rem;
+            }
+            
+            .admin-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .admin-tabs-list {
+                padding: 0.2rem;
+            }
+            
+            .admin-tab-trigger {
+                font-size: 0.75rem;
+                padding: 0.5rem 0.6rem;
+            }
+            
+            .resources-table {
+                min-width: 600px;
+            }
+            
+            .resources-table th,
+            .resources-table td {
+                padding: 0.4rem;
+                font-size: 0.75rem;
+            }
+            
+            .admin-card {
+                padding: 0.75rem;
+            }
+            
+            .modal-content {
+                width: 95%;
+                max-height: 90vh;
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <header class="admin-header">
+            <div class="admin-brand">ATHENIUM ADMIN</div>
+            <nav class="admin-nav">
+                <a href="/dashboard" class="nav-link">Dashboard</a>
+                <a href="/admin" class="nav-link active">Admin</a>
+                <button class="logout-btn" data-testid="button-logout" onclick="logout()">SALIR</button>
+            </nav>
+        </header>
+        
+        <main class="admin-main">
+            <!-- Admin Dashboard Stats -->
+            <section class="admin-stats">
+                <div class="admin-stat-card">
+                    <div class="admin-stat-icon">U</div>
+                    <div class="admin-stat-value" id="totalUsers">0</div>
+                    <div class="admin-stat-label">Total Usuarios</div>
+                    <div class="admin-stat-sublabel" id="activeUsers">0 activos</div>
+                </div>
+                <div class="admin-stat-card">
+                    <div class="admin-stat-icon">P</div>
+                    <div class="admin-stat-value" id="avgProgress">0%</div>
+                    <div class="admin-stat-label">Progreso Promedio</div>
+                    <div class="admin-stat-sublabel">Completado en formación</div>
+                </div>
+                <div class="admin-stat-card">
+                    <div class="admin-stat-icon">T</div>
+                    <div class="admin-stat-value" id="totalTrades">0</div>
+                    <div class="admin-stat-label">Total Operaciones</div>
+                    <div class="admin-stat-sublabel">Realizadas por usuarios</div>
+                </div>
+                <div class="admin-stat-card">
+                    <div class="admin-stat-icon">R</div>
+                    <div class="admin-stat-value" id="totalResources">0</div>
+                    <div class="admin-stat-label">Recursos</div>
+                    <div class="admin-stat-sublabel" id="resourcesBreakdown">0 archivos, 0 enlaces</div>
+                </div>
+            </section>
+
+            <!-- Admin Tabs Navigation -->
+            <div class="admin-tabs">
+                <div class="admin-tabs-list">
+                    <button class="admin-tab-trigger active" data-testid="tab-users" onclick="switchAdminTab('users')">Usuarios</button>
+                    <button class="admin-tab-trigger" data-testid="tab-files" onclick="switchAdminTab('files')">Archivos</button>
+                    <button class="admin-tab-trigger" data-testid="tab-links" onclick="switchAdminTab('links')">Enlaces</button>
+                    <button class="admin-tab-trigger" data-testid="tab-mentorships" onclick="switchAdminTab('mentorships')">Mentorías</button>
+                    <button class="admin-tab-trigger" data-testid="tab-bias" onclick="switchAdminTab('bias')">Bias del Día</button>
+                </div>
+            </div>
+
+            <!-- Users Tab -->
+            <div id="users-admin-tab" class="admin-tab-content active">
+                <section class="admin-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Gestión de Usuarios</h2>
+                        <div style="display: flex; gap: 1rem; align-items: center;">
+                            <button class="add-btn" data-testid="button-bulk-actions" onclick="showBulkActions()">Acciones Masivas</button>
+                            <span id="selectedCount" data-testid="text-selected-count" style="opacity: 0.7; font-size: 0.9rem;">0 seleccionados</span>
+                        </div>
+                    </div>
+                    <div class="admin-card">
+                        <div class="search-container">
+                            <span class="search-icon">S</span>
+                            <input type="text" class="search-input" id="searchUsers" data-testid="input-search-users" placeholder="Buscar usuarios por email o ID..." oninput="filterUsers()">
+                        </div>
+                        <div class="users-grid" id="usersGrid">
+                            <div style="grid-column: 1 / -1; text-align: center; opacity: 0.5; padding: 2rem;">
+                                Cargando usuarios...
+                            </div>
+                        </div>
+                        
+                        <!-- Pagination -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; padding: 1rem 0;">
+                            <div style="opacity: 0.7; font-size: 0.9rem;">
+                                Mostrando <span id="pageInfo" data-testid="text-page-info">1-10 de 23</span> usuarios
+                            </div>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button class="action-btn" data-testid="button-prev-page" onclick="previousPage()" disabled>Anterior</button>
+                                <button class="action-btn" data-testid="button-next-page" onclick="nextPage()">Siguiente</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Files Tab -->
+            <div id="files-admin-tab" class="admin-tab-content">
+                <section class="admin-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Archivos Globales</h2>
+                        <button class="add-btn" data-testid="button-add-file" onclick="openAddFileModal()">+ Agregar Archivo</button>
+                    </div>
+                    <div class="admin-card">
+                        <div class="search-container">
+                            <span class="search-icon">S</span>
+                            <input type="text" class="search-input" id="searchFiles" placeholder="Buscar archivos por título..." oninput="filterFiles()">
+                        </div>
+                        <div class="enhanced-table">
+                            <table class="resources-table">
+                                <thead>
+                                    <tr>
+                                        <th>Título</th>
+                                        <th>Archivo</th>
+                                        <th>Descripción</th>
+                                        <th>Fecha</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="filesTableBody">
+                                    <tr>
+                                        <td colspan="5" style="text-align: center; opacity: 0.5; padding: 2rem;">
+                                            Cargando archivos...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Links Tab -->
+            <div id="links-admin-tab" class="admin-tab-content">
+                <section class="admin-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Enlaces Globales</h2>
+                        <button class="add-btn" data-testid="button-add-link" onclick="openAddLinkModal()">+ Agregar Enlace</button>
+                    </div>
+                    <div class="admin-card">
+                        <div class="search-container">
+                            <span class="search-icon">S</span>
+                            <input type="text" class="search-input" id="searchLinks" placeholder="Buscar enlaces por título o URL..." oninput="filterLinks()">
+                        </div>
+                        <div class="enhanced-table">
+                            <table class="resources-table">
+                                <thead>
+                                    <tr>
+                                        <th>Título</th>
+                                        <th>URL</th>
+                                        <th>Descripción</th>
+                                        <th>Fecha</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="linksTableBody">
+                                    <tr>
+                                        <td colspan="5" style="text-align: center; opacity: 0.5; padding: 2rem;">
+                                            Cargando enlaces...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Mentorships Tab -->
+            <div id="mentorships-admin-tab" class="admin-tab-content">
+                <section class="admin-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Mentorías Globales</h2>
+                        <div style="display: flex; gap: 1rem;">
+                            <button class="add-btn" data-testid="button-add-mentorship" onclick="openAddMentorshipModal()">+ Subir</button>
+                        </div>
+                    </div>
+                    <div class="admin-card">
+                        <div class="search-container">
+                            <span class="search-icon">S</span>
+                            <input type="text" class="search-input" id="searchMentorships" placeholder="Buscar mentorías por título..." oninput="filterMentorships()">
+                        </div>
+                        <div class="enhanced-table">
+                            <table class="resources-table">
+                                <thead>
+                                    <tr>
+                                        <th>Título</th>
+                                        <th>Tipo</th>
+                                        <th>Contenido</th>
+                                        <th>Descripción</th>
+                                        <th>Fecha</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="mentorshipsTableBody">
+                                    <tr>
+                                        <td colspan="6" style="text-align: center; opacity: 0.5; padding: 2rem;">
+                                            Cargando mentorías...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Bias del Día Tab -->
+            <div id="bias-admin-tab" class="admin-tab-content">
+                <section class="admin-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Bias del Día</h2>
+                        <button class="add-btn" data-testid="button-add-bias" onclick="openAddBiasModal()">+ Agregar Bias</button>
+                    </div>
+                    <div class="admin-card">
+                        <div class="enhanced-table">
+                            <table class="resources-table">
+                                <thead>
+                                    <tr>
+                                        <th>Bias</th>
+                                        <th>Creado</th>
+                                        <th>Tiempo Transcurrido</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="biasTableBody">
+                                    <tr>
+                                        <td colspan="4" style="text-align: center; opacity: 0.5; padding: 2rem;">
+                                            Cargando bias del día...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+    
+    <!-- User Edit Modal -->
+    <div class="modal" id="editUserModal">
+        <div class="modal-content">
+            <h3 class="modal-title">Editar Usuario</h3>
+            <form id="editUserForm">
+                <div class="form-group">
+                    <label class="form-label">Email:</label>
+                    <input type="email" class="form-input" id="editUserEmail">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">ID Único (8 dígitos):</label>
+                    <input type="text" class="form-input" id="editUserUniqueId" maxlength="8" pattern="[0-9]{8}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Progreso (%):</label>
+                    <input type="number" class="form-input" id="editUserProgress" min="0" max="100" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Foto de Perfil:</label>
+                    <div class="photo-options" id="photoOptionsEdit">
+                        <!-- Opciones por Defecto -->
+                        <div class="photo-option-admin default1 selected" data-photo="default1">A</div>
+                        <div class="photo-option-admin default2" data-photo="default2">B</div>
+                        <div class="photo-option-admin default3" data-photo="default3">C</div>
+                        <div class="photo-option-admin default4" data-photo="default4">D</div>
+                        <div class="photo-option-admin default5" data-photo="default5">E</div>
+                        <!-- Opciones de Internet -->
+                        <div class="photo-option-admin stock1" data-photo="stock1" style="background-image: url('/attached_assets/stock_images/professional_trading_d8cf2de0.jpg'); background-size: cover; background-position: center;"></div>
+                        <div class="photo-option-admin stock2" data-photo="stock2" style="background-image: url('/attached_assets/stock_images/professional_trading_302144d3.jpg'); background-size: cover; background-position: center;"></div>
+                        <div class="photo-option-admin stock3" data-photo="stock3" style="background-image: url('/attached_assets/stock_images/professional_trading_3a907cc7.jpg'); background-size: cover; background-position: center;"></div>
+                        <div class="photo-option-admin stock4" data-photo="stock4" style="background-image: url('/attached_assets/stock_images/professional_trading_765b431c.jpg'); background-size: cover; background-position: center;"></div>
+                        <div class="photo-option-admin stock5" data-photo="stock5" style="background-image: url('/attached_assets/stock_images/professional_trading_33f36bef.jpg'); background-size: cover; background-position: center;"></div>
+                    </div>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="modal-btn" onclick="closeEditUserModal()">Cancelar</button>
+                    <button type="submit" class="modal-btn primary">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add File Modal -->
+    <div class="modal" id="addFileModal">
+        <div class="modal-content">
+            <h3 class="modal-title">Agregar Archivo Global</h3>
+            <form id="addFileForm" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label class="form-label">Título:</label>
+                    <input type="text" class="form-input" id="fileTitle" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Seleccionar Archivo:</label>
+                    <input type="file" class="form-input" id="fileInput" required accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.jpg,.jpeg,.png,.gif,.mp4,.mov,.avi,.mkv">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Descripción (opcional):</label>
+                    <textarea class="form-textarea" id="fileDescription" rows="3"></textarea>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="modal-btn" onclick="closeAddFileModal()">Cancelar</button>
+                    <button type="submit" class="modal-btn primary">Subir Archivo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Link Modal -->
+    <div class="modal" id="addLinkModal">
+        <div class="modal-content">
+            <h3 class="modal-title">Agregar Enlace Global</h3>
+            <form id="addLinkForm">
+                <div class="form-group">
+                    <label class="form-label">Título:</label>
+                    <input type="text" class="form-input" id="linkTitle" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">URL:</label>
+                    <input type="url" class="form-input" id="linkUrl" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Descripción (opcional):</label>
+                    <textarea class="form-textarea" id="linkDescription" rows="3"></textarea>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="modal-btn" onclick="closeAddLinkModal()">Cancelar</button>
+                    <button type="submit" class="modal-btn primary">Agregar Enlace</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Mentorship Modal (Unified) -->
+    <div class="modal" id="addMentorshipModal">
+        <div class="modal-content">
+            <h3 class="modal-title">Subir Mentoría</h3>
+            <form id="addMentorshipForm" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label class="form-label">Tipo de Mentoría:</label>
+                    <select class="form-select" id="mentorshipType" onchange="toggleMentorshipFields()" required>
+                        <option value="">Seleccionar tipo...</option>
+                        <option value="youtube">Link de YouTube</option>
+                        <option value="upload">Subir Archivo de Video</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Título:</label>
+                    <input type="text" class="form-input" id="mentorshipTitle" required>
+                </div>
+                
+                <!-- YouTube Fields -->
+                <div class="form-group" id="youtubeFields" style="display: none;">
+                    <label class="form-label">URL de YouTube:</label>
+                    <input type="url" class="form-input" id="mentorshipYoutubeUrl" placeholder="https://www.youtube.com/watch?v=...">
+                </div>
+                
+                <!-- File Upload Fields -->
+                <div class="form-group" id="fileFields" style="display: none;">
+                    <label class="form-label">Seleccionar Archivo de Video:</label>
+                    <input type="file" class="form-input" id="mentorshipFileInput" accept=".mp4,.mov,.avi,.mkv,.webm">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Descripción (opcional):</label>
+                    <textarea class="form-textarea" id="mentorshipDescription" rows="3"></textarea>
+                </div>
+                
+                <div class="modal-buttons">
+                    <button type="button" class="modal-btn" onclick="closeAddMentorshipModal()">Cancelar</button>
+                    <button type="submit" class="modal-btn primary">Subir Mentoría</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Bias Modal -->
+    <div class="modal" id="addBiasModal">
+        <div class="modal-content">
+            <h3 class="modal-title">Agregar Bias del Día</h3>
+            <form id="addBiasForm">
+                <div class="form-group">
+                    <label class="form-label">Bias:</label>
+                    <textarea class="form-textarea" id="biasText" placeholder="Ejemplo: COMPRA EURUSD - Ruptura de zona de resistencia..." rows="3" required></textarea>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="modal-btn" onclick="closeAddBiasModal()">Cancelar</button>
+                    <button type="submit" class="modal-btn primary">Agregar Bias</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        let currentEditingUser = null;
+        let selectedPhotoEdit = 'default1';
+
+        // Profile photo options mapping
+        const photoLabels = {
+            default1: 'A',
+            default2: 'B', 
+            default3: 'C',
+            default4: 'D',
+            default5: 'E',
+            stock1: '',  // Empty because it's an image
+            stock2: '',  // Empty because it's an image
+            stock3: '',  // Empty because it's an image
+            stock4: '',  // Empty because it's an image
+            stock5: ''   // Empty because it's an image
+        };
+
+        // Load all data on page load
+        async function loadAdminData() {
+            console.log('Loading admin data...');
+            await Promise.all([
+                loadUsers(),
+                loadGlobalFiles(),
+                loadGlobalLinks(),
+                loadGlobalMentorships(),
+                loadBiasEntries()
+            ]);
+            updateAdminStats(); // Update stats after loading data
+            console.log('Admin data loaded successfully');
+        }
+
+        // Load all users
+        async function loadUsers() {
+            console.log('Loading users...');
+            try {
+                const response = await fetch('/api/admin/users');
+                console.log('Users API response:', response.status, response.statusText);
+                if (response.ok) {
+                    const users = await response.json();
+                    console.log('Users data:', users);
+                    displayUsers(users);
+                } else {
+                    console.error('Error loading users, status:', response.status);
+                    document.getElementById('usersGrid').innerHTML = 
+                        '<div style="grid-column: 1 / -1; text-align: center; opacity: 0.5; padding: 2rem;">Error al cargar usuarios</div>';
+                }
+            } catch (error) {
+                console.error('Error loading users:', error);
+                document.getElementById('usersGrid').innerHTML = 
+                    '<div style="grid-column: 1 / -1; text-align: center; opacity: 0.5; padding: 2rem;">Error al cargar usuarios</div>';
+            }
+        }
+
+        // Display users in grid
+        function displayUsers(users) {
+            console.log('Displaying users:', users.length, 'users');
+            const usersGrid = document.getElementById('usersGrid');
+            console.log('usersGrid element:', usersGrid);
+            
+            // Store users data for filtering if this is the full dataset
+            if (allUsers.length === 0 || users.length === allUsers.length) {
+                storeUsersData(users);
+            }
+            
+            if (users.length === 0) {
+                usersGrid.innerHTML = 
+                    '<div style="grid-column: 1 / -1; text-align: center; opacity: 0.5; padding: 2rem;">No hay usuarios registrados</div>';
+                return;
+            }
+
+            const html = users.map(user => `
+                <div class="user-card">
+                    <div class="user-header">
+                        <div class="user-photo ${user.profilePhoto || 'default1'}">${photoLabels[user.profilePhoto || 'default1']}</div>
+                        <div class="user-info">
+                            <h3>${user.email}</h3>
+                            <div class="user-id">${user.uniqueId}</div>
+                        </div>
+                    </div>
+                    <div class="user-progress">
+                        <div class="progress-label">Progreso: ${parseFloat(user.progress || 0).toFixed(1)}%</div>
+                        <div class="progress-bar-small">
+                            <div class="progress-fill-small" style="width: ${user.progress || 0}%"></div>
+                        </div>
+                    </div>
+                    <div class="user-actions">
+                        <button class="action-btn primary" onclick="editUser(${user.id})">Editar</button>
+                    </div>
+                </div>
+            `).join('');
+            
+            console.log('Generated HTML length:', html.length);
+            usersGrid.innerHTML = html;
+            console.log('HTML set to usersGrid');
+        }
+
+        // Load global files
+        async function loadGlobalFiles() {
+            try {
+                const response = await fetch('/api/global-files');
+                if (response.ok) {
+                    const files = await response.json();
+                    displayFiles(files);
+                } else {
+                    console.error('Error loading files');
+                    document.getElementById('filesTableBody').innerHTML = 
+                        '<tr><td colspan="5" style="text-align: center; opacity: 0.5; padding: 2rem;">Error al cargar archivos</td></tr>';
+                }
+            } catch (error) {
+                console.error('Error loading files:', error);
+                document.getElementById('filesTableBody').innerHTML = 
+                    '<tr><td colspan="5" style="text-align: center; opacity: 0.5; padding: 2rem;">Error al cargar archivos</td></tr>';
+            }
+        }
+
+        // Display files in table
+        function displayFiles(files) {
+            const tableBody = document.getElementById('filesTableBody');
+            
+            // Store files data for filtering if this is the full dataset
+            if (allFiles.length === 0 || files.length === allFiles.length) {
+                storeFilesData(files);
+            }
+            
+            if (files.length === 0) {
+                tableBody.innerHTML = 
+                    '<tr><td colspan="5" style="text-align: center; opacity: 0.5; padding: 2rem;">No hay archivos globales</td></tr>';
+                return;
+            }
+
+            tableBody.innerHTML = files.map(file => `
+                <tr>
+                    <td>${file.title}</td>
+                    <td>${file.filename}</td>
+                    <td>${file.description || 'Sin descripción'}</td>
+                    <td>${new Date(file.uploadedAt).toLocaleDateString()}</td>
+                    <td>
+                        <button class="action-btn" onclick="deleteFile(${file.id})">Eliminar</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Load global links
+        async function loadGlobalLinks() {
+            try {
+                const response = await fetch('/api/global-links');
+                if (response.ok) {
+                    const links = await response.json();
+                    displayLinks(links);
+                } else {
+                    console.error('Error loading links');
+                    document.getElementById('linksTableBody').innerHTML = 
+                        '<tr><td colspan="5" style="text-align: center; opacity: 0.5; padding: 2rem;">Error al cargar enlaces</td></tr>';
+                }
+            } catch (error) {
+                console.error('Error loading links:', error);
+                document.getElementById('linksTableBody').innerHTML = 
+                    '<tr><td colspan="5" style="text-align: center; opacity: 0.5; padding: 2rem;">Error al cargar enlaces</td></tr>';
+            }
+        }
+
+        // Display links in table
+        function displayLinks(links) {
+            const tableBody = document.getElementById('linksTableBody');
+            
+            // Store links data for filtering if this is the full dataset
+            if (allLinks.length === 0 || links.length === allLinks.length) {
+                storeLinksData(links);
+            }
+            
+            if (links.length === 0) {
+                tableBody.innerHTML = 
+                    '<tr><td colspan="5" style="text-align: center; opacity: 0.5; padding: 2rem;">No hay enlaces globales</td></tr>';
+                return;
+            }
+
+            tableBody.innerHTML = links.map(link => `
+                <tr>
+                    <td>${link.title}</td>
+                    <td><a href="${link.url}" target="_blank" style="color: var(--color-switch-active);">${link.url}</a></td>
+                    <td>${link.description || 'Sin descripción'}</td>
+                    <td>${new Date(link.createdAt).toLocaleDateString()}</td>
+                    <td>
+                        <button class="action-btn" onclick="deleteLink(${link.id})">Eliminar</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Load global mentorships
+        async function loadGlobalMentorships() {
+            try {
+                const response = await fetch('/api/global-mentorships');
+                if (response.ok) {
+                    const mentorships = await response.json();
+                    displayMentorships(mentorships);
+                } else {
+                    console.error('Error loading mentorships');
+                    document.getElementById('mentorshipsTableBody').innerHTML = 
+                        '<tr><td colspan="6" style="text-align: center; opacity: 0.5; padding: 2rem;">Error al cargar mentorías</td></tr>';
+                }
+            } catch (error) {
+                console.error('Error loading mentorships:', error);
+                document.getElementById('mentorshipsTableBody').innerHTML = 
+                    '<tr><td colspan="6" style="text-align: center; opacity: 0.5; padding: 2rem;">Error al cargar mentorías</td></tr>';
+            }
+        }
+
+        // Display mentorships in table
+        function displayMentorships(mentorships) {
+            const tableBody = document.getElementById('mentorshipsTableBody');
+            if (mentorships.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; opacity: 0.5; padding: 2rem;">No hay mentorías disponibles</td></tr>';
+                return;
+            }
+            
+            tableBody.innerHTML = mentorships.map(mentorship => `
+                <tr>
+                    <td style="font-weight: bold;">${mentorship.title}</td>
+                    <td>
+                        <span class="resource-type ${mentorship.type}">${mentorship.type === 'youtube' ? 'YouTube' : 'Archivo'}</span>
+                    </td>
+                    <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${mentorship.description || '-'}</td>
+                    <td style="font-size: 0.8rem; opacity: 0.7;">${new Date(mentorship.createdAt).toLocaleDateString()}</td>
+                    <td>
+                        ${mentorship.type === 'youtube' ? 
+                            `<a href="${mentorship.youtubeUrl}" target="_blank" style="color: #ff6b6b; text-decoration: none;">Ver video</a>` :
+                            `<span style="color: #51cf66;">${mentorship.filename}</span>`
+                        }
+                    </td>
+                    <td>
+                        <button class="action-btn delete" onclick="deleteMentorship(${mentorship.id})" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;">
+                            Eliminar
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Delete mentorship function
+        async function deleteMentorship(mentorshipId) {
+            if (!confirm('¿Estás seguro de que deseas eliminar esta mentoría?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/admin/global-mentorships/${mentorshipId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    await loadGlobalMentorships();
+                } else {
+                    alert('Error al eliminar mentoría');
+                }
+            } catch (error) {
+                console.error('Error deleting mentorship:', error);
+                alert('Error al eliminar mentoría');
+            }
+        }
+
+        // User Management Functions
+        async function editUser(userId) {
+            try {
+                const response = await fetch('/api/admin/users');
+                if (response.ok) {
+                    const users = await response.json();
+                    const user = users.find(u => u.id === userId);
+                    if (user) {
+                        currentEditingUser = user;
+                        openEditUserModal(user);
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading user for edit:', error);
+                alert('Error al cargar datos del usuario');
+            }
+        }
+
+        function openEditUserModal(user) {
+            document.getElementById('editUserEmail').value = user.email;
+            document.getElementById('editUserUniqueId').value = user.uniqueId;
+            document.getElementById('editUserProgress').value = parseFloat(user.progress || 0);
+            
+            // Set photo selection
+            selectedPhotoEdit = user.profilePhoto || 'default1';
+            document.querySelectorAll('#photoOptionsEdit .photo-option-admin').forEach(option => {
+                option.classList.remove('selected');
+                if (option.dataset.photo === selectedPhotoEdit) {
+                    option.classList.add('selected');
+                }
+            });
+
+            document.getElementById('editUserModal').style.display = 'flex';
+        }
+
+        function closeEditUserModal() {
+            document.getElementById('editUserModal').style.display = 'none';
+            currentEditingUser = null;
+        }
+
+        // File Management Functions
+        function openAddFileModal() {
+            document.getElementById('addFileForm').reset();
+            document.getElementById('addFileModal').style.display = 'flex';
+        }
+
+        function closeAddFileModal() {
+            document.getElementById('addFileModal').style.display = 'none';
+        }
+
+        async function deleteFile(fileId) {
+            if (confirm('¿Estás seguro de que quieres eliminar este archivo?')) {
+                try {
+                    const response = await fetch(`/api/admin/global-files/${fileId}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (response.ok) {
+                        await loadGlobalFiles();
+                    } else {
+                        alert('Error al eliminar el archivo');
+                    }
+                } catch (error) {
+                    console.error('Error deleting file:', error);
+                    alert('Error al eliminar el archivo');
+                }
+            }
+        }
+
+        // Link Management Functions
+        function openAddLinkModal() {
+            document.getElementById('addLinkForm').reset();
+            document.getElementById('addLinkModal').style.display = 'flex';
+        }
+
+        function closeAddLinkModal() {
+            document.getElementById('addLinkModal').style.display = 'none';
+        }
+
+        async function deleteLink(linkId) {
+            if (confirm('¿Estás seguro de que quieres eliminar este enlace?')) {
+                try {
+                    const response = await fetch(`/api/admin/global-links/${linkId}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (response.ok) {
+                        await loadGlobalLinks();
+                    } else {
+                        alert('Error al eliminar el enlace');
+                    }
+                } catch (error) {
+                    console.error('Error deleting link:', error);
+                    alert('Error al eliminar el enlace');
+                }
+            }
+        }
+
+        // Form Handlers
+        document.getElementById('editUserForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!currentEditingUser) return;
+
+            const updateData = {
+                email: document.getElementById('editUserEmail').value,
+                uniqueId: document.getElementById('editUserUniqueId').value,
+                progress: document.getElementById('editUserProgress').value,
+                profilePhoto: selectedPhotoEdit
+            };
+
+            try {
+                const response = await fetch(`/api/admin/user/${currentEditingUser.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updateData)
+                });
+
+                if (response.ok) {
+                    closeEditUserModal();
+                    await loadUsers();
+                } else {
+                    const error = await response.json();
+                    alert(error.error || 'Error al actualizar usuario');
+                }
+            } catch (error) {
+                console.error('Error updating user:', error);
+                alert('Error al actualizar usuario');
+            }
+        });
+
+        document.getElementById('addFileForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const fileInput = document.getElementById('fileInput');
+            const selectedFile = fileInput.files[0];
+            
+            if (!selectedFile) {
+                alert('Por favor selecciona un archivo');
+                return;
+            }
+            
+            // Create FormData to send the actual file
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+            formData.append('title', document.getElementById('fileTitle').value);
+            formData.append('description', document.getElementById('fileDescription').value);
+
+            try {
+                // Show progress
+                const submitButton = e.target.querySelector('button[type="submit"]');
+                const originalText = submitButton.textContent;
+                submitButton.textContent = 'Subiendo...';
+                submitButton.disabled = true;
+
+                const response = await fetch('/api/admin/upload-file', {
+                    method: 'POST',
+                    body: formData  // No Content-Type header - browser sets it automatically for multipart
+                });
+
+                if (response.ok) {
+                    closeAddFileModal();
+                    await loadGlobalFiles();
+                    alert('Archivo subido exitosamente');
+                    // Clear the form
+                    document.getElementById('addFileForm').reset();
+                } else {
+                    const error = await response.json();
+                    alert(error.error || 'Error al subir archivo');
+                }
+            } catch (error) {
+                console.error('Error uploading file:', error);
+                alert('Error al subir archivo');
+            } finally {
+                // Restore button
+                const submitButton = e.target.querySelector('button[type="submit"]');
+                submitButton.textContent = 'Subir Archivo';
+                submitButton.disabled = false;
+            }
+        });
+
+        document.getElementById('addLinkForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const linkData = {
+                title: document.getElementById('linkTitle').value,
+                url: document.getElementById('linkUrl').value,
+                description: document.getElementById('linkDescription').value
+            };
+
+            try {
+                const response = await fetch('/api/admin/global-links', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(linkData)
+                });
+
+                if (response.ok) {
+                    closeAddLinkModal();
+                    await loadGlobalLinks();
+                } else {
+                    const error = await response.json();
+                    alert(error.error || 'Error al agregar enlace');
+                }
+            } catch (error) {
+                console.error('Error adding link:', error);
+                alert('Error al agregar enlace');
+            }
+        });
+
+        // Photo selection for edit modal
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('photo-option-admin')) {
+                document.querySelectorAll('#photoOptionsEdit .photo-option-admin').forEach(option => {
+                    option.classList.remove('selected');
+                });
+                
+                e.target.classList.add('selected');
+                selectedPhotoEdit = e.target.dataset.photo;
+            }
+        });
+
+        // Close modals when clicking outside
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.style.display = 'none';
+                }
+            });
+        });
+
+        // Admin Tab switching functionality
+        function switchAdminTab(tabName) {
+            // Hide all admin tab contents
+            document.querySelectorAll('.admin-tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all admin tab triggers
+            document.querySelectorAll('.admin-tab-trigger').forEach(trigger => {
+                trigger.classList.remove('active');
+            });
+            
+            // Show selected admin tab content
+            document.getElementById(tabName + '-admin-tab').classList.add('active');
+            
+            // Set active admin tab trigger
+            event.target.classList.add('active');
+        }
+
+        // Update admin dashboard statistics
+        function updateAdminStats() {
+            // Get data from loaded users, files, and links
+            const userElements = document.querySelectorAll('#usersGrid .user-card');
+            const fileRows = document.querySelectorAll('#filesTableBody tr:not([data-empty])');
+            const linkRows = document.querySelectorAll('#linksTableBody tr:not([data-empty])');
+            
+            // Calculate stats
+            const totalUsers = userElements.length;
+            let activeUsers = 0;
+            let totalTrades = 0;
+            let totalProgress = 0;
+
+            // Count active users and calculate totals (simulated data for demo)
+            userElements.forEach(() => {
+                if (Math.random() > 0.3) activeUsers++; // ~70% active
+                totalTrades += Math.floor(Math.random() * 50); // Random trades
+                totalProgress += Math.random() * 100; // Random progress
+            });
+
+            const avgProgress = totalUsers > 0 ? (totalProgress / totalUsers) : 0;
+            const totalFiles = fileRows.length;
+            const totalLinks = linkRows.length;
+
+            // Update DOM elements
+            document.getElementById('totalUsers').textContent = totalUsers;
+            document.getElementById('activeUsers').textContent = activeUsers + ' activos';
+            document.getElementById('avgProgress').textContent = avgProgress.toFixed(1) + '%';
+            document.getElementById('totalTrades').textContent = totalTrades;
+            document.getElementById('totalResources').textContent = totalFiles + totalLinks;
+            document.getElementById('resourcesBreakdown').textContent = totalFiles + ' archivos, ' + totalLinks + ' enlaces';
+        }
+
+        // Filter functions for search
+        let allUsers = [];
+        let allFiles = [];
+        let allLinks = [];
+
+        // Store data when loaded for filtering
+        function storeUsersData(users) {
+            allUsers = users;
+        }
+
+        function storeFilesData(files) {
+            allFiles = files;
+        }
+
+        function storeLinksData(links) {
+            allLinks = links;
+        }
+
+        // Filter users in real-time
+        function filterUsers() {
+            const searchTerm = document.getElementById('searchUsers').value.toLowerCase();
+            if (searchTerm === '') {
+                displayUsers(allUsers);
+            } else {
+                const filteredUsers = allUsers.filter(user => 
+                    user.email.toLowerCase().includes(searchTerm) ||
+                    user.uniqueId.toLowerCase().includes(searchTerm)
+                );
+                displayUsers(filteredUsers);
+            }
+        }
+
+        // Filter files in real-time
+        function filterFiles() {
+            const searchTerm = document.getElementById('searchFiles').value.toLowerCase();
+            if (searchTerm === '') {
+                displayFiles(allFiles);
+            } else {
+                const filteredFiles = allFiles.filter(file => 
+                    file.title.toLowerCase().includes(searchTerm) ||
+                    file.filename.toLowerCase().includes(searchTerm)
+                );
+                displayFiles(filteredFiles);
+            }
+        }
+
+        // Filter links in real-time
+        function filterLinks() {
+            const searchTerm = document.getElementById('searchLinks').value.toLowerCase();
+            if (searchTerm === '') {
+                displayLinks(allLinks);
+            } else {
+                const filteredLinks = allLinks.filter(link => 
+                    link.title.toLowerCase().includes(searchTerm) ||
+                    link.url.toLowerCase().includes(searchTerm)
+                );
+                displayLinks(filteredLinks);
+            }
+        }
+
+        // Logout function
+        async function logout() {
+            try {
+                const response = await fetch('/api/logout', {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    window.location.href = '/';
+                } else {
+                    console.error('Error logging out');
+                    window.location.href = '/';
+                }
+            } catch (error) {
+                console.error('Error logging out:', error);
+                window.location.href = '/';
+            }
+        }
+
+        // Mentorship Management Functions
+        function openAddMentorshipModal() {
+            document.getElementById('addMentorshipForm').reset();
+            document.getElementById('mentorshipType').value = '';
+            toggleMentorshipFields(); // Reset field visibility
+            document.getElementById('addMentorshipModal').style.display = 'flex';
+        }
+
+        function closeAddMentorshipModal() {
+            document.getElementById('addMentorshipModal').style.display = 'none';
+        }
+
+        function toggleMentorshipFields() {
+            const type = document.getElementById('mentorshipType').value;
+            const youtubeFields = document.getElementById('youtubeFields');
+            const fileFields = document.getElementById('fileFields');
+            const youtubeInput = document.getElementById('mentorshipYoutubeUrl');
+            const fileInput = document.getElementById('mentorshipFileInput');
+            
+            // Hide all fields initially
+            youtubeFields.style.display = 'none';
+            fileFields.style.display = 'none';
+            
+            // Remove required attributes
+            youtubeInput.removeAttribute('required');
+            fileInput.removeAttribute('required');
+            
+            // Show relevant fields based on selection
+            if (type === 'youtube') {
+                youtubeFields.style.display = 'block';
+                youtubeInput.setAttribute('required', 'required');
+            } else if (type === 'upload') {
+                fileFields.style.display = 'block';
+                fileInput.setAttribute('required', 'required');
+            }
+        }
+
+        // Unified Mentorship Form Handler
+        document.getElementById('addMentorshipForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const type = document.getElementById('mentorshipType').value;
+            const title = document.getElementById('mentorshipTitle').value;
+            const description = document.getElementById('mentorshipDescription').value;
+            
+            if (!type) {
+                alert('Por favor selecciona el tipo de mentoría');
+                return;
+            }
+            
+            if (!title.trim()) {
+                alert('Por favor ingresa un título');
+                return;
+            }
+
+            try {
+                // Show upload progress
+                const submitButton = e.target.querySelector('button[type="submit"]');
+                const originalText = submitButton.textContent;
+                submitButton.textContent = type === 'youtube' ? 'Agregando...' : 'Subiendo video...';
+                submitButton.disabled = true;
+
+                let response;
+                
+                if (type === 'youtube') {
+                    // Handle YouTube mentorship
+                    const youtubeUrl = document.getElementById('mentorshipYoutubeUrl').value;
+                    
+                    if (!youtubeUrl.trim()) {
+                        alert('Por favor ingresa la URL de YouTube');
+                        return;
+                    }
+                    
+                    const mentorshipData = {
+                        title: title,
+                        type: 'youtube',
+                        youtubeUrl: youtubeUrl,
+                        description: description
+                    };
+
+                    response = await fetch('/api/admin/global-mentorships', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(mentorshipData)
+                    });
+                    
+                } else if (type === 'upload') {
+                    // Handle file upload mentorship
+                    const videoInput = document.getElementById('mentorshipFileInput');
+                    const selectedVideo = videoInput.files[0];
+                    
+                    if (!selectedVideo) {
+                        alert('Por favor selecciona un archivo de video');
+                        return;
+                    }
+
+                    // Create FormData to send the actual video file
+                    const formData = new FormData();
+                    formData.append('video', selectedVideo);
+                    formData.append('title', title);
+                    formData.append('description', description);
+
+                    response = await fetch('/api/admin/upload-mentorship', {
+                        method: 'POST',
+                        body: formData  // No Content-Type header - browser sets it automatically for multipart
+                    });
+                }
+
+                if (response.ok) {
+                    closeAddMentorshipModal();
+                    await loadGlobalMentorships(); // Refresh the list
+                    console.log(`${type} mentorship added successfully`);
+                    alert(type === 'youtube' ? 'Mentoría de YouTube agregada exitosamente' : 'Mentoría de video subida exitosamente');
+                    document.getElementById('addMentorshipForm').reset();
+                    toggleMentorshipFields(); // Reset field visibility
+                } else {
+                    const error = await response.json();
+                    alert(error.error || `Error al ${type === 'youtube' ? 'agregar mentoría de YouTube' : 'subir mentoría de video'}`);
+                }
+            } catch (error) {
+                console.error(`Error ${type === 'youtube' ? 'adding YouTube' : 'uploading video'} mentorship:`, error);
+                alert(`Error al ${type === 'youtube' ? 'agregar mentoría de YouTube' : 'subir mentoría de video'}`);
+            } finally {
+                // Restore button state
+                const submitButton = e.target.querySelector('button[type="submit"]');
+                submitButton.textContent = 'Subir Mentoría';
+                submitButton.disabled = false;
+            }
+        });
+
+        // === BIAS ENTRIES FUNCTIONS ===
+
+        // Load bias entries
+        async function loadBiasEntries() {
+            console.log('Loading bias entries...');
+            try {
+                const response = await fetch('/api/bias');
+                if (response.ok) {
+                    const bias = await response.json();
+                    console.log('Bias entries data:', bias);
+                    displayBiasEntries(bias);
+                } else {
+                    console.error('Error loading bias entries, status:', response.status);
+                    document.getElementById('biasTableBody').innerHTML = 
+                        '<tr><td colspan="4" style="text-align: center; opacity: 0.5; padding: 2rem;">Error al cargar bias entries</td></tr>';
+                }
+            } catch (error) {
+                console.error('Error loading bias entries:', error);
+                document.getElementById('biasTableBody').innerHTML = 
+                    '<tr><td colspan="4" style="text-align: center; opacity: 0.5; padding: 2rem;">Error al cargar bias entries</td></tr>';
+            }
+        }
+
+        // Display bias entries in table
+        function displayBiasEntries(biasEntries) {
+            console.log('Displaying bias entries:', biasEntries.length, 'entries');
+            const tableBody = document.getElementById('biasTableBody');
+            
+            if (biasEntries.length === 0) {
+                tableBody.innerHTML = 
+                    '<tr><td colspan="4" style="text-align: center; opacity: 0.5; padding: 2rem;">No hay bias del día registrados</td></tr>';
+                return;
+            }
+
+            const html = biasEntries.map(bias => {
+                const timeAgo = getTimeAgo(new Date(bias.createdAt));
+                const formattedDate = new Date(bias.createdAt).toLocaleString('es-ES');
+                
+                return `
+                    <tr>
+                        <td style="max-width: 300px; word-wrap: break-word;">${bias.bias}</td>
+                        <td>${formattedDate}</td>
+                        <td style="font-weight: bold; color: var(--color-switch-active);">${timeAgo}</td>
+                        <td>
+                            <button class="action-btn" onclick="deleteBiasEntry(${bias.id})" style="background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.3); color: #ff6b6b;">
+                                Eliminar
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            
+            console.log('Generated bias HTML length:', html.length);
+            tableBody.innerHTML = html;
+            console.log('HTML set to biasTableBody');
+        }
+
+        // Calculate time ago
+        function getTimeAgo(date) {
+            const now = new Date();
+            const diff = now - date;
+            const minutes = Math.floor(diff / (1000 * 60));
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+            if (minutes < 60) {
+                return `Hace ${minutes} min`;
+            } else if (hours < 24) {
+                return `Hace ${hours} hora${hours > 1 ? 's' : ''}`;
+            } else {
+                return `Hace ${days} día${days > 1 ? 's' : ''}`;
+            }
+        }
+
+        // Open add bias modal
+        function openAddBiasModal() {
+            document.getElementById('addBiasModal').style.display = 'flex';
+            document.getElementById('biasText').focus();
+        }
+
+        // Close add bias modal
+        function closeAddBiasModal() {
+            document.getElementById('addBiasModal').style.display = 'none';
+            document.getElementById('addBiasForm').reset();
+        }
+
+        // Delete bias entry
+        async function deleteBiasEntry(biasId) {
+            if (!confirm('¿Estás seguro de que quieres eliminar este bias del día?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/bias/${biasId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    await loadBiasEntries(); // Refresh the list
+                    console.log('Bias entry deleted successfully');
+                } else {
+                    const error = await response.json();
+                    alert(error.error || 'Error al eliminar bias entry');
+                }
+            } catch (error) {
+                console.error('Error deleting bias entry:', error);
+                alert('Error al eliminar bias entry');
+            }
+        }
+
+        // Handle add bias form submission
+        document.getElementById('addBiasForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const biasText = document.getElementById('biasText').value.trim();
+
+            if (!biasText) {
+                alert('Por favor ingresa el texto del bias');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/bias', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        bias: biasText
+                    })
+                });
+
+                if (response.ok) {
+                    closeAddBiasModal();
+                    await loadBiasEntries(); // Refresh the list
+                    console.log('Bias entry added successfully');
+                } else {
+                    const error = await response.json();
+                    alert(error.error || 'Error al agregar bias entry');
+                }
+            } catch (error) {
+                console.error('Error adding bias entry:', error);
+                alert('Error al agregar bias entry');
+            }
+        });
+
+        // Update switchAdminTab function to handle bias tab
+        function switchAdminTab(tabName) {
+            // Remove active class from all tabs and tab triggers
+            document.querySelectorAll('.admin-tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.admin-tab-trigger').forEach(trigger => {
+                trigger.classList.remove('active');
+            });
+            
+            // Add active class to selected tab and trigger
+            const selectedTab = document.getElementById(tabName + '-admin-tab');
+            const selectedTrigger = document.querySelector(`[data-testid="tab-${tabName}"]`);
+            
+            if (selectedTab) selectedTab.classList.add('active');
+            if (selectedTrigger) selectedTrigger.classList.add('active');
+            
+            // Load data for specific tabs if needed
+            if (tabName === 'bias') {
+                loadBiasEntries();
+            }
+        }
+
+        // Initialize admin panel
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAdminData();
+        });
+    </script>
+</body>
+</html>

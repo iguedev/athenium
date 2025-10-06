@@ -1,0 +1,2414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ATHENIUM Trading Platform - Professional dashboard for traders with real-time analysis, portfolio management and advanced trading tools.">
+    <meta property="og:title" content="ATHENIUM Trading Dashboard">
+    <meta property="og:description" content="Professional trading platform with real-time analysis and advanced portfolio management.">
+    <meta property="og:type" content="website">
+    <title>ATHENIUM - Dashboard</title>
+    <style>
+        :root {
+            --color-text: rgba(255, 255, 255, 0.9);
+            --color-bg: #111111;
+            --color-title: rgba(255, 255, 255, 0.95);
+            --color-switch-active: #ffffff;
+        }
+        
+        body {
+            font-family: "TheGoodMonolith", monospace;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        .dashboard-container {
+            min-height: 100vh;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+        }
+        
+        .dashboard-header {
+            background: rgba(20, 20, 20, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .dashboard-brand {
+            font-family: "TheGoodMonolith", monospace;
+            font-size: 1.5rem;
+            color: var(--color-title);
+            letter-spacing: 1px;
+        }
+        
+        .dashboard-user {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .dashboard-user span {
+            color: var(--color-text);
+            opacity: 0.8;
+        }
+        
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--color-text);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-family: "TheGoodMonolith", monospace;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .dashboard-main {
+            padding: 1rem;
+            height: calc(100vh - 80px);
+            overflow-y: auto;
+        }
+        
+        .dashboard-welcome {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .dashboard-welcome h1 {
+            font-family: "TheGoodMonolith", monospace;
+            font-size: 2.5rem;
+            color: var(--color-title);
+            margin-bottom: 0.5rem;
+        }
+        
+        .dashboard-welcome p {
+            color: var(--color-text);
+            opacity: 0.7;
+            font-size: 1.1rem;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .dashboard-layout {
+            display: grid;
+            grid-template-columns: 320px 1fr 300px;
+            gap: 1rem;
+            height: 100%;
+        }
+
+        .left-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .center-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .market-ticker {
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            overflow: hidden;
+        }
+
+        .ticker-scroll {
+            display: flex;
+            animation: scroll 30s linear infinite;
+            gap: 2rem;
+        }
+
+        @keyframes scroll {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        .ticker-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+        }
+
+        .price-positive { color: #22c55e; }
+        .price-negative { color: #ef4444; }
+        .news-high { color: #ef4444; font-weight: bold; }
+        .news-medium { color: #f59e0b; font-weight: bold; }
+        .news-upcoming { color: #22c55e; font-weight: bold; }
+
+        .chart-widget {
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            height: 450px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .portfolio-donut {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: conic-gradient(
+                #22c55e 0deg 120deg,
+                #3b82f6 120deg 200deg,
+                #f59e0b 200deg 280deg,
+                #ef4444 280deg 360deg
+            );
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .portfolio-center {
+            width: 80px;
+            height: 80px;
+            background: var(--color-bg);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .watchlist {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .watchlist-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .watchlist-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .news-feed {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .news-item {
+            padding: 1rem;
+            margin: 0.5rem 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border-left: 3px solid var(--color-switch-active);
+        }
+
+        .news-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .news-time {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .performance-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .mini-stat {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .mini-stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--color-switch-active);
+        }
+
+        .mini-stat-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            margin-top: 0.5rem;
+        }
+
+        .trades-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .trades-table th,
+        .trades-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.85rem;
+        }
+
+        .trades-table th {
+            font-weight: bold;
+            opacity: 0.8;
+        }
+
+        .order-book {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .order-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
+            font-family: 'Courier New', monospace;
+        }
+
+        .order-buy { background: rgba(34, 197, 94, 0.1); }
+        .order-sell { background: rgba(239, 68, 68, 0.1); }
+
+        .compact-card {
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .compact-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .compact-icon {
+            width: 24px;
+            height: 24px;
+            background: var(--color-switch-active);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--color-bg);
+        }
+
+        .compact-title {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: var(--color-title);
+            margin: 0;
+        }
+        
+        .dashboard-card {
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--color-switch-active), #ffffff);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-weight: bold;
+            color: var(--color-bg);
+        }
+        
+        .card-title {
+            font-family: "TheGoodMonolith", monospace;
+            font-size: 1.3rem;
+            color: var(--color-title);
+            margin: 0;
+        }
+        
+        .user-id {
+            font-family: "TheGoodMonolith", monospace;
+            font-size: 0.9rem;
+            color: var(--color-switch-active);
+            font-weight: bold;
+            text-align: center;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .copy-icon {
+            cursor: pointer;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .copy-icon:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+        
+        .view-trades-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--color-text);
+            padding: 0.4rem 1rem;
+            border-radius: 6px;
+            font-family: "TheGoodMonolith", monospace;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.7rem;
+            margin-top: 0.75rem;
+            width: auto;
+            max-width: 160px;
+            margin-left: auto;
+            margin-right: auto;
+            text-align: center;
+            text-decoration: none;
+            display: block;
+        }
+        
+        .view-trades-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: var(--color-switch-active);
+        }
+        
+        .discord-link-icon {
+            margin-top: 0.75rem;
+            text-align: center;
+        }
+        
+        .discord-link-icon a {
+            display: inline-block;
+            opacity: 0.6;
+            transition: all 0.3s ease;
+        }
+        
+        .discord-link-icon a:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+        
+        .progress-container {
+            margin: 1rem 0;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--color-switch-active), #ffffff);
+            border-radius: 10px;
+            transition: width 0.8s ease;
+            position: relative;
+        }
+        
+        .progress-text {
+            color: var(--color-text);
+            text-align: center;
+            margin-top: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .resources-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .resources-list li {
+            background: rgba(255, 255, 255, 0.05);
+            margin: 0.5rem 0;
+            padding: 0.8rem;
+            border-radius: 8px;
+            border-left: 3px solid var(--color-switch-active);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .resources-list li:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+        
+        .links-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .link-item {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 12px;
+            text-decoration: none;
+            color: var(--color-text);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .link-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--color-switch-active);
+            transform: translateY(-2px);
+        }
+        
+        .link-icon {
+            width: 30px;
+            height: 30px;
+            background: var(--color-switch-active);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-weight: bold;
+            color: var(--color-bg);
+            font-size: 0.9rem;
+        }
+
+        /* Profile Photo Styles */
+        .profile-photo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .profile-photo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--color-bg);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .profile-photo:hover {
+            transform: scale(1.05);
+            border-color: var(--color-switch-active);
+        }
+
+        .profile-photo.selected {
+            border-color: var(--color-switch-active);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        /* Default Profile photo */
+        .default { 
+            background-image: url('@assets/image_1759692184414.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        
+        .custom-photo {
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        /* Floating animation for profile photos */
+        .profile-photo {
+            animation: floatProfile 6s ease-in-out infinite;
+        }
+
+        @keyframes floatProfile {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+
+        /* Pulse animation on hover */
+        .profile-photo:hover {
+            animation: pulseHover 0.8s ease-in-out infinite;
+        }
+
+        @keyframes pulseHover {
+            0%, 100% { transform: scale(1.05); box-shadow: 0 0 20px rgba(255, 255, 255, 0.3); }
+            50% { transform: scale(1.1); box-shadow: 0 0 30px rgba(255, 255, 255, 0.5); }
+        }
+
+        .photo-selector {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .photo-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: bold;
+            color: var(--color-bg);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .photo-option:hover {
+            transform: scale(1.1);
+            border-color: var(--color-switch-active);
+        }
+
+        .photo-option.selected {
+            border-color: var(--color-switch-active);
+            transform: scale(1.1);
+        }
+
+        .change-photo-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--color-text);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-family: "TheGoodMonolith", monospace;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .change-photo-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .photo-selector-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .photo-selector-content {
+            background: rgba(20, 20, 20, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .photo-selector-title {
+            font-family: "TheGoodMonolith", monospace;
+            color: var(--color-title);
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+        }
+
+        .photo-selector-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .photo-selector-grid .photo-option {
+            width: 60px;
+            height: 60px;
+            font-size: 1.5rem;
+            justify-self: center;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--color-text);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-family: "TheGoodMonolith", monospace;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-btn.primary {
+            background: var(--color-switch-active);
+            color: var(--color-bg);
+        }
+
+        .modal-btn.primary:hover {
+            background: #ffffff;
+        }
+
+        /* Dashboard Tabs System */
+        .dashboard-tabs {
+            margin-bottom: 2rem;
+        }
+
+        .tabs-list {
+            display: flex;
+            background: rgba(20, 20, 20, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 0.3rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .tab-trigger {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--color-text);
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-family: "TheGoodMonolith", monospace;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+
+        .tab-trigger:hover {
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .tab-trigger.active {
+            background: var(--color-switch-active);
+            color: var(--color-bg);
+            opacity: 1;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Additional Statistics Grid */
+        .stats-extended {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--color-switch-active);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 1rem;
+        }
+
+        .stat-progress {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .stat-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--color-switch-active), #ffffff);
+            transition: width 0.8s ease;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .action-btn-quick {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--color-text);
+            padding: 1rem;
+            border-radius: 12px;
+            font-family: "TheGoodMonolith", monospace;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            text-decoration: none;
+        }
+
+        .action-btn-quick:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: var(--color-switch-active);
+            transform: translateY(-2px);
+        }
+
+        .action-icon {
+            width: 35px;
+            height: 35px;
+            background: var(--color-switch-active);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: var(--color-bg);
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-header {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .dashboard-brand {
+                font-size: 1.2rem;
+            }
+            
+            .dashboard-main {
+                padding: 0.5rem;
+                height: calc(100vh - 120px);
+            }
+            
+            .dashboard-layout {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+            
+            .left-panel,
+            .center-panel,
+            .right-panel {
+                gap: 0.75rem;
+            }
+            
+            .compact-card {
+                padding: 0.75rem;
+            }
+            
+            .compact-header {
+                margin-bottom: 0.5rem;
+            }
+            
+            .compact-title {
+                font-size: 0.75rem;
+            }
+            
+            .user-id {
+                font-size: 0.75rem;
+            }
+            
+            .view-trades-btn {
+                font-size: 0.65rem;
+                padding: 0.35rem 0.5rem;
+            }
+            
+            .market-ticker {
+                padding: 0.5rem;
+                margin-bottom: 0.5rem;
+            }
+            
+            .tradingview-widget-container {
+                height: 40px !important;
+                margin-bottom: 0.5rem;
+            }
+            
+            .tradingview-widget-container__widget {
+                height: 40px !important;
+            }
+            
+            .tradingview-widget-copyright {
+                display: none !important;
+            }
+            
+            .chart-widget {
+                height: 200px;
+                padding: 0.75rem;
+            }
+            
+            .chart-widget > div:last-child {
+                height: 150px !important;
+            }
+            
+            .portfolio-donut {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .portfolio-center {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .performance-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.5rem;
+            }
+            
+            .mini-stat {
+                padding: 0.5rem;
+            }
+            
+            .mini-stat-value {
+                font-size: 1rem;
+            }
+            
+            .mini-stat-label {
+                font-size: 0.7rem;
+            }
+            
+            .trades-table th,
+            .trades-table td {
+                padding: 0.5rem;
+                font-size: 0.7rem;
+            }
+            
+            .watchlist-item {
+                padding: 0.5rem;
+                font-size: 0.8rem;
+            }
+            
+            .order-row {
+                padding: 0.25rem;
+                font-size: 0.7rem;
+            }
+            
+            .news-item {
+                padding: 0.75rem;
+            }
+            
+            .news-title {
+                font-size: 0.75rem;
+            }
+            
+            .news-time {
+                font-size: 0.7rem;
+            }
+            
+            .action-btn-quick {
+                padding: 0.5rem !important;
+                font-size: 0.8rem;
+            }
+            
+            .ticker-scroll {
+                gap: 1rem;
+            }
+            
+            .ticker-item {
+                font-size: 0.75rem;
+            }
+            
+            .stat-value {
+                font-size: 1.3rem;
+            }
+            
+            .stat-label {
+                font-size: 0.75rem;
+            }
+            
+            .dashboard-welcome h1 {
+                font-size: 1.5rem;
+            }
+            
+            .dashboard-welcome p {
+                font-size: 0.9rem;
+            }
+            
+            .card-title {
+                font-size: 1rem;
+            }
+            
+            .progress-text {
+                font-size: 0.8rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .dashboard-header {
+                padding: 0.75rem;
+            }
+            
+            .dashboard-brand {
+                font-size: 1.2rem;
+            }
+            
+            .dashboard-main {
+                padding: 0.25rem;
+            }
+            
+            .compact-card {
+                padding: 0.5rem;
+            }
+            
+            .performance-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .portfolio-donut {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .portfolio-center {
+                width: 45px;
+                height: 45px;
+            }
+            
+            .chart-widget > div:last-child {
+                height: 120px !important;
+            }
+            
+            /* Reduce ticker tape size on mobile */
+            .tradingview-widget-container {
+                height: 60px !important;
+            }
+            
+            .tradingview-widget-container__widget {
+                height: 50px !important;
+            }
+            
+            /* Reduce "View my trades" button width on mobile and center them */
+            .view-trades-btn {
+                padding: 0.4rem 0.5rem;
+                font-size: 0.65rem;
+                max-width: 120px;
+                display: block;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            
+            /* Reduce useful files font size on mobile */
+            #usefulFiles li {
+                font-size: 0.75rem !important;
+            }
+            
+            #usefulFiles li div:first-child {
+                font-size: 0.75rem !important;
+            }
+            
+            #usefulFiles li div:last-child {
+                font-size: 0.7rem !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <header class="dashboard-header">
+            <div class="dashboard-brand">ATHENIUM</div>
+            <div class="dashboard-user">
+                <span id="userEmail" data-testid="text-user-email"></span>
+                <button class="logout-btn" data-testid="button-logout" onclick="logout()">LOG OUT</button>
+            </div>
+        </header>
+        
+        <main class="dashboard-main">
+            <!-- Full Screen Layout -->
+            <div class="dashboard-layout">
+                <!-- Left Panel -->
+                <div class="left-panel">
+                    <!-- 1. User Profile -->
+                    <div class="compact-card">
+                        <div class="compact-header">
+                            <div class="compact-icon" style="background: #111111; color: white; display: flex; align-items: center; justify-content: center;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12ZM12 14C9.33 14 4 15.34 4 18V20H20V18C20 15.34 14.67 14 12 14Z"/>
+                                </svg>
+                            </div>
+                            <h3 class="compact-title">My Profile</h3>
+                        </div>
+                        <div class="profile-photo-container">
+                            <div class="profile-photo default" id="currentProfilePhoto"></div>
+                            <button class="change-photo-btn" data-testid="button-change-photo" onclick="openPhotoSelector()">Change Photo</button>
+                        </div>
+                        <div class="user-id" id="userId" data-testid="text-user-id">
+                            Loading...
+                            <span class="copy-icon" data-testid="button-copy-id" onclick="copyUserId()" title="Copy ID">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M16 1H4C2.9 1 2 1.9 2 3V17H4V3H16V1ZM19 5H8C6.9 5 6 5.9 6 7V21C6 22.1 6.9 23 8 23H19C20.1 23 21 22.1 21 21V7C21 5.9 20.1 5 19 5ZM19 21H8V7H19V21Z"/>
+                                </svg>
+                            </span>
+                        </div>
+                        <a href="#" id="viewProfileBtn" class="view-trades-btn" data-testid="link-view-profile" style="margin-bottom: 0.5rem;">View my profile</a>
+                        <a href="/tradedrec" class="view-trades-btn" data-testid="link-view-trades">View my trades</a>
+                    </div>
+
+                    <!-- 2. Discord Account -->
+                    <div class="compact-card">
+                        <div class="compact-header">
+                            <div class="compact-icon" style="background: rgba(255,255,255,0.15); color: white; display: flex; align-items: center; justify-content: center;">
+                                <svg width="14" height="14" viewBox="0 0 71 55" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M60.1045 4.8978C55.5792 2.8214 50.7265 1.2916 45.6527 0.41542C45.5603 0.39851 45.468 0.440769 45.4204 0.525289C44.7963 1.6353 44.105 3.0834 43.6209 4.2216C38.1637 3.4046 32.7345 3.4046 27.3892 4.2216C26.905 3.0581 26.1886 1.6353 25.5617 0.525289C25.5141 0.443589 25.4218 0.40133 25.3294 0.41542C20.2584 1.2888 15.4057 2.8186 10.8776 4.8978C10.8384 4.9147 10.8048 4.9429 10.7825 4.9795C1.57795 18.7309 -0.943561 32.1443 0.293408 45.3914C0.299005 45.4562 0.335386 45.5182 0.385761 45.5576C6.45866 50.0174 12.3413 52.7249 18.1147 54.5195C18.2071 54.5477 18.305 54.5139 18.3638 54.4378C19.7295 52.5728 20.9469 50.6063 21.9907 48.5383C22.0523 48.4172 21.9935 48.2735 21.8676 48.2256C19.9366 47.4931 18.0979 46.6 16.3292 45.5858C16.1893 45.5041 16.1781 45.304 16.3068 45.2082C16.679 44.9293 17.0513 44.6391 17.4067 44.3461C17.471 44.2926 17.5606 44.2813 17.6362 44.3151C29.2558 49.6202 41.8354 49.6202 53.3179 44.3151C53.3935 44.2785 53.4831 44.2898 53.5502 44.3433C53.9057 44.6363 54.2779 44.9293 54.6529 45.2082C54.7816 45.304 54.7732 45.5041 54.6333 45.5858C52.8646 46.6197 51.0259 47.4931 49.0921 48.2228C48.9662 48.2707 48.9102 48.4172 48.9718 48.5383C50.038 50.6034 51.2554 52.5699 52.5959 54.435C52.6519 54.5139 52.7526 54.5477 52.845 54.5195C58.6464 52.7249 64.529 50.0174 70.6019 45.5576C70.6551 45.5182 70.6887 45.459 70.6943 45.3942C72.1747 30.0791 68.2147 16.7757 60.1968 4.9823C60.1772 4.9429 60.1437 4.9147 60.1045 4.8978ZM23.7259 37.3253C20.2276 37.3253 17.3451 34.1136 17.3451 30.1693C17.3451 26.225 20.1717 23.0133 23.7259 23.0133C27.308 23.0133 30.1626 26.2532 30.1066 30.1693C30.1066 34.1136 27.28 37.3253 23.7259 37.3253ZM47.3178 37.3253C43.8196 37.3253 40.9371 34.1136 40.9371 30.1693C40.9371 26.225 43.7636 23.0133 47.3178 23.0133C50.9 23.0133 53.7545 26.2532 53.6986 30.1693C53.6986 34.1136 50.9 37.3253 47.3178 37.3253Z" fill="white"/>
+                                </svg>
+                            </div>
+                            <h3 class="compact-title">Discord Account</h3>
+                        </div>
+                        <div style="text-align: center; padding: 1rem;">
+                            <div id="discordAccount" data-testid="discord-account-info">
+                                <div style="margin-bottom: 1rem; opacity: 0.7;">
+                                    <svg width="48" height="48" viewBox="0 0 71 55" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M60.1045 4.8978C55.5792 2.8214 50.7265 1.2916 45.6527 0.41542C45.5603 0.39851 45.468 0.440769 45.4204 0.525289C44.7963 1.6353 44.105 3.0834 43.6209 4.2216C38.1637 3.4046 32.7345 3.4046 27.3892 4.2216C26.905 3.0581 26.1886 1.6353 25.5617 0.525289C25.5141 0.443589 25.4218 0.40133 25.3294 0.41542C20.2584 1.2888 15.4057 2.8186 10.8776 4.8978C10.8384 4.9147 10.8048 4.9429 10.7825 4.9795C1.57795 18.7309 -0.943561 32.1443 0.293408 45.3914C0.299005 45.4562 0.335386 45.5182 0.385761 45.5576C6.45866 50.0174 12.3413 52.7249 18.1147 54.5195C18.2071 54.5477 18.305 54.5139 18.3638 54.4378C19.7295 52.5728 20.9469 50.6063 21.9907 48.5383C22.0523 48.4172 21.9935 48.2735 21.8676 48.2256C19.9366 47.4931 18.0979 46.6 16.3292 45.5858C16.1893 45.5041 16.1781 45.304 16.3068 45.2082C16.679 44.9293 17.0513 44.6391 17.4067 44.3461C17.471 44.2926 17.5606 44.2813 17.6362 44.3151C29.2558 49.6202 41.8354 49.6202 53.3179 44.3151C53.3935 44.2785 53.4831 44.2898 53.5502 44.3433C53.9057 44.6363 54.2779 44.9293 54.6529 45.2082C54.7816 45.304 54.7732 45.5041 54.6333 45.5858C52.8646 46.6197 51.0259 47.4931 49.0921 48.2228C48.9662 48.2707 48.9102 48.4172 48.9718 48.5383C50.038 50.6034 51.2554 52.5699 52.5959 54.435C52.6519 54.5139 52.7526 54.5477 52.845 54.5195C58.6464 52.7249 64.529 50.0174 70.6019 45.5576C70.6551 45.5182 70.6887 45.459 70.6943 45.3942C72.1747 30.0791 68.2147 16.7757 60.1968 4.9823C60.1772 4.9429 60.1437 4.9147 60.1045 4.8978ZM23.7259 37.3253C20.2276 37.3253 17.3451 34.1136 17.3451 30.1693C17.3451 26.225 20.1717 23.0133 23.7259 23.0133C27.308 23.0133 30.1626 26.2532 30.1066 30.1693C30.1066 34.1136 27.28 37.3253 23.7259 37.3253ZM47.3178 37.3253C43.8196 37.3253 40.9371 34.1136 40.9371 30.1693C40.9371 26.225 43.7636 23.0133 47.3178 23.0133C50.9 23.0133 53.7545 26.2532 53.6986 30.1693C53.6986 34.1136 50.9 37.3253 47.3178 37.3253Z" fill="rgba(255,255,255,0.6)"/>
+                                    </svg>
+                                </div>
+                                <div style="font-weight: bold; margin-bottom: 0.5rem;">Not linked</div>
+                                <div style="font-size: 0.8rem; opacity: 0.7; margin-bottom: 0.5rem;">To link your account, use the /login command on Discord</div>
+                                <div class="discord-link-icon" id="discordLinkIcon">
+                                    <a href="https://discord.gg/jm4thHfnCf" target="_blank" rel="noopener noreferrer" data-testid="link-discord-server" title="Join our Discord server">
+                                        <svg width="32" height="32" viewBox="0 0 71 55" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M60.1045 4.8978C55.5792 2.8214 50.7265 1.2916 45.6527 0.41542C45.5603 0.39851 45.468 0.440769 45.4204 0.525289C44.7963 1.6353 44.105 3.0834 43.6209 4.2216C38.1637 3.4046 32.7345 3.4046 27.3892 4.2216C26.905 3.0581 26.1886 1.6353 25.5617 0.525289C25.5141 0.443589 25.4218 0.40133 25.3294 0.41542C20.2584 1.2888 15.4057 2.8186 10.8776 4.8978C10.8384 4.9147 10.8048 4.9429 10.7825 4.9795C1.57795 18.7309 -0.943561 32.1443 0.293408 45.3914C0.299005 45.4562 0.335386 45.5182 0.385761 45.5576C6.45866 50.0174 12.3413 52.7249 18.1147 54.5195C18.2071 54.5477 18.305 54.5139 18.3638 54.4378C19.7295 52.5728 20.9469 50.6063 21.9907 48.5383C22.0523 48.4172 21.9935 48.2735 21.8676 48.2256C19.9366 47.4931 18.0979 46.6 16.3292 45.5858C16.1893 45.5041 16.1781 45.304 16.3068 45.2082C16.679 44.9293 17.0513 44.6391 17.4067 44.3461C17.471 44.2926 17.5606 44.2813 17.6362 44.3151C29.2558 49.6202 41.8354 49.6202 53.3179 44.3151C53.3935 44.2785 53.4831 44.2898 53.5502 44.3433C53.9057 44.6363 54.2779 44.9293 54.6529 45.2082C54.7816 45.304 54.7732 45.5041 54.6333 45.5858C52.8646 46.6197 51.0259 47.4931 49.0921 48.2228C48.9662 48.2707 48.9102 48.4172 48.9718 48.5383C50.038 50.6034 51.2554 52.5699 52.5959 54.435C52.6519 54.5139 52.7526 54.5477 52.845 54.5195C58.6464 52.7249 64.529 50.0174 70.6019 45.5576C70.6551 45.5182 70.6887 45.459 70.6943 45.3942C72.1747 30.0791 68.2147 16.7757 60.1968 4.9823C60.1772 4.9429 60.1437 4.9147 60.1045 4.8978ZM23.7259 37.3253C20.2276 37.3253 17.3451 34.1136 17.3451 30.1693C17.3451 26.225 20.1717 23.0133 23.7259 23.0133C27.308 23.0133 30.1626 26.2532 30.1066 30.1693C30.1066 34.1136 27.28 37.3253 23.7259 37.3253ZM47.3178 37.3253C43.8196 37.3253 40.9371 34.1136 40.9371 30.1693C40.9371 26.225 43.7636 23.0133 47.3178 23.0133C50.9 23.0133 53.7545 26.2532 53.6986 30.1693C53.6986 34.1136 50.9 37.3253 47.3178 37.3253Z" fill="white"/>
+                                        </svg>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. Quick Stats -->
+                    <div class="compact-card">
+                        <div class="compact-header">
+                            <div class="compact-icon" style="background: rgba(255,255,255,0.15); color: white; display: flex; align-items: center; justify-content: center;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M3 3V21H21V19H5V3H3ZM7 17H9V10H7V17ZM11 17H13V7H11V17ZM15 17H17V13H15V17Z"/>
+                                </svg>
+                            </div>
+                            <h3 class="compact-title">Quick Stats</h3>
+                        </div>
+                        <div class="performance-grid">
+                            <div class="mini-stat">
+                                <div class="mini-stat-value" id="totalTrades" data-testid="stat-total-trades">147</div>
+                                <div class="mini-stat-label">Trades</div>
+                            </div>
+                            <div class="mini-stat">
+                                <div class="mini-stat-value price-positive" id="winRate" data-testid="stat-win-rate">72%</div>
+                                <div class="mini-stat-label">Win Rate</div>
+                            </div>
+                            <div class="mini-stat">
+                                <div class="mini-stat-value price-positive" id="monthlyPL" data-testid="stat-monthly-pl">+$12,430</div>
+                                <div class="mini-stat-label">Monthly P&L</div>
+                            </div>
+                            <div class="mini-stat">
+                                <div class="mini-stat-value" id="riskRewardRatio" data-testid="stat-risk-reward">4.2</div>
+                                <div class="mini-stat-label">Ratio R/R</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Center Panel -->
+                <div class="center-panel">
+                    <!-- 5. Useful Files Area -->
+                    <div class="chart-widget">
+                        <div class="compact-header">
+                            <div class="compact-icon" style="background: rgba(255,255,255,0.15); color: white; display: flex; align-items: center; justify-content: center;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M10 4H4C2.89 4 2 4.89 2 6V18C2 19.11 2.89 20 4 20H20C21.11 20 22 19.11 22 18V8C22 6.89 21.11 6 20 6H12L10 4Z"/>
+                                </svg>
+                            </div>
+                            <h3 class="compact-title">Useful Files</h3>
+                        </div>
+                        <div style="width: 100%; height: 200px; background: rgba(255,255,255,0.05); border-radius: 8px; padding: 1rem; overflow-y: auto;">
+                            <ul id="usefulFiles" data-testid="useful-files-container" style="list-style: none; padding: 0; margin: 0;">
+                                <li style="text-align: center; opacity: 0.7; margin-top: 2rem;">
+                                    <div style="margin-bottom: 0.5rem;">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="rgba(255,255,255,0.6)" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M19,3H14.82C14.4,1.84 13.3,1 12,1C10.7,1 9.6,1.84 9.18,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M12,3A1,1 0 0,1 13,4A1,1 0 0,1 12,5A1,1 0 0,1 11,4A1,1 0 0,1 12,3"/>
+                                        </svg>
+                                    </div>
+                                    <div>Loading files...</div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- 6. Last Mentorship -->
+                    <div class="compact-card">
+                        <div class="compact-header">
+                            <div class="compact-icon" style="background: rgba(255,255,255,0.15); color: white; display: flex; align-items: center; justify-content: center;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M19 3H5C3.9 3 3 3.9 3 5V14C3 15.1 3.9 16 5 16H6L7 19L12 16H19C20.1 16 21 15.1 21 14V5C21 3.9 20.1 3 19 3ZM7 13C6.45 13 6 12.55 6 12S6.45 11 7 11 8 11.45 8 12 7.55 13 7 13ZM12 13C11.45 13 11 12.55 11 12S11.45 11 12 11 13 11.45 13 12 12.55 13 12 13ZM17 13C16.45 13 16 12.55 16 12S16.45 11 17 11 18 11.45 18 12 17.55 13 17 13Z"/>
+                                </svg>
+                            </div>
+                            <h3 class="compact-title">Last Mentorship</h3>
+                        </div>
+                        <div style="max-height: 280px; overflow-y: auto; text-align: center; padding-bottom: 0.5rem;">
+                            <div id="lastMentorshipVideo" data-testid="mentorship-video-container">
+                                <div style="background: linear-gradient(135deg, rgba(30,30,30,0.9), rgba(50,50,50,0.6)), url('https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=300&h=200&fit=crop&crop=center') center/cover; border-radius: 8px; padding: 0; margin: 1rem 0; height: 160px; position: relative; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; border: 1px solid rgba(255,255,255,0.1);" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+                                    <!-- Play button overlay -->
+                                    <div style="background: rgba(255,255,255,0.9); border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px); transition: all 0.3s ease;" onmouseover="this.style.backgroundColor='rgba(255,255,255,1)'" onmouseout="this.style.backgroundColor='rgba(255,255,255,0.9)'">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="rgba(0,0,0,0.8)" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M8,5.14V19.14L19,12.14L8,5.14Z"/>
+                                        </svg>
+                                    </div>
+                                    <!-- Video info overlay -->
+                                    <div style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.8)); padding: 1rem; border-radius: 0 0 8px 8px;">
+                                        <div style="font-weight: bold; margin-bottom: 0.25rem; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">Trading Fundamentals</div>
+                                        <div style="font-size: 0.8rem; opacity: 0.9; color: rgba(255,255,255,0.8);">Available Mentorship • 45 min</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="action-btn-quick" data-testid="button-view-more-mentorships" onclick="viewMoreMentorships()" style="padding: 0.75rem; margin: 1rem 0.5rem 0.5rem 0.5rem; width: calc(100% - 1rem);">
+                                <div style="font-size: 0.9rem;">View more</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 7. Progress & Learning -->
+                    <div class="compact-card">
+                        <div class="compact-header">
+                            <div class="compact-icon" style="background: rgba(255,255,255,0.15); color: white; display: flex; align-items: center; justify-content: center;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2ZM12 6.5L11.37 9L8.87 9.37L11.37 9.74L12 12.26L12.63 9.74L15.13 9.37L12.63 9L12 6.5ZM19.5 3.5L20.29 6.03L22.5 6.5L20.29 6.97L19.5 9.5L18.71 6.97L16.5 6.5L18.71 6.03L19.5 3.5Z"/>
+                                </svg>
+                            </div>
+                            <h3 class="compact-title">My Progress</h3>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progressFill" style="width: 68%"></div>
+                            </div>
+                            <div class="progress-text" id="progressText">68% completed</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Panel -->
+                <div class="right-panel">
+                    <!-- 8. Daily Bias -->
+                    <div class="compact-card">
+                        <div class="compact-header">
+                            <div class="compact-icon" style="background: rgba(255,255,255,0.15); color: white; display: flex; align-items: center; justify-content: center;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M16 6L18.29 8.29L13.41 13.17L9.41 9.17L2 16.59L3.41 18L9.41 12L13.41 16L19.71 9.71L22 12V6H16Z"/>
+                                </svg>
+                            </div>
+                            <h3 class="compact-title">Market News</h3>
+                        </div>
+                        <!-- TradingView Widget BEGIN -->
+                        <div class="tradingview-widget-container" style="height: 700px; min-height: 700px;">
+                          <div class="tradingview-widget-container__widget" style="height: 650px; min-height: 650px;"></div>
+                          <div class="tradingview-widget-copyright"><a href="https://www.tradingview.com/economic-calendar/" rel="noopener nofollow" target="_blank"><span>Economic Calendar</span></a><span class="trademark"></span></div>
+                          <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-events.js" async>
+                          {
+                          "colorTheme": "dark",
+                          "isTransparent": true,
+                          "locale": "en",
+                          "countryFilter": "us,ca,jp,gb",
+                          "importanceFilter": "-1,0,1",
+                          "width": "100%",
+                          "height": "650"
+                        }
+                          </script>
+                        </div>
+                        <!-- TradingView Widget END -->
+                    </div>
+
+
+                    <!-- 10. Market News -->
+                    <div class="compact-card">
+                        <div class="compact-header">
+                            <div class="compact-icon" style="background: rgba(255,255,255,0.15); color: white; display: flex; align-items: center; justify-content: center;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4 6V18H20V6H4ZM6 8H18V16H6V8ZM7 9V15H8V9H7ZM9 9V12H13V9H9ZM14 9V15H17V9H14ZM10 13V15H12V13H10Z"/>
+                                </svg>
+                            </div>
+                            <h3 class="compact-title">DAILY LEVELS</h3>
+                        </div>
+                        <div class="news-feed" id="biasNewsFeed">
+                            <div class="news-item">
+                                <div class="news-title" style="text-align: center; opacity: 0.5;">Loading daily levels...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Photo Selector Modal -->
+    <div class="photo-selector-modal" id="photoSelectorModal">
+        <div class="photo-selector-content">
+            <h3 class="photo-selector-title">Change Profile Picture</h3>
+            <div style="display: flex; flex-direction: column; gap: 1.5rem; align-items: center;">
+                <!-- Default Option -->
+                <div style="text-align: center;">
+                    <div class="photo-option default selected" data-photo="default" style="background-image: url('attached_assets/default-avatar.svg'); margin: 0 auto 0.5rem;"></div>
+                    <label style="font-size: 0.9rem; opacity: 0.8;">Foto por defecto</label>
+                </div>
+                
+                <!-- Upload Custom Photo -->
+                <div style="text-align: center;">
+                    <input type="file" id="customPhotoInput" accept="image/*" style="display: none;" onchange="handleCustomPhotoUpload(event)">
+                    <button onclick="document.getElementById('customPhotoInput').click()" 
+                            style="background: rgba(255, 255, 255, 0.1); border: 2px dashed rgba(255, 255, 255, 0.3); color: var(--color-text); padding: 2rem; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; font-family: 'TheGoodMonolith', monospace;">
+                        <div style="font-size: 1.2rem; margin-bottom: 0.5rem;">📁</div>
+                        <div>Upload custom photo</div>
+                        <div style="font-size: 0.8rem; opacity: 0.7; margin-top: 0.5rem;">JPG, PNG, GIF (max. 5MB)</div>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn" onclick="closePhotoSelector()">Cancel</button>
+                <button class="modal-btn primary" onclick="saveProfilePhoto()">Save</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentUser = null;
+        let selectedPhoto = 'default';
+        let customPhotoData = null;
+
+        // Profile photo options mapping - Simplified
+        const photoLabels = {
+            default: ''
+        };
+
+        // Profile photo image paths - Local assets
+        const photoImages = {
+            default: 'attached_assets/default-avatar.svg'
+        };
+
+        // Load user data on page load
+        async function loadUserData() {
+            try {
+                const response = await fetch('/api/user');
+                if (response.ok) {
+                    currentUser = await response.json();
+                    
+                    // Display user info
+                    const userEmailEl = document.getElementById('userEmail');
+                    if (userEmailEl) {
+                        userEmailEl.textContent = currentUser.email;
+                    }
+                    const userIdEl = document.getElementById('userId');
+                    if (userIdEl) {
+                        // Update only the text content, preserve the copy icon
+                        const textNode = userIdEl.firstChild;
+                        if (textNode && textNode.nodeType === Node.TEXT_NODE) {
+                            textNode.textContent = currentUser.uniqueId + ' ';
+                        } else {
+                            // If structure is different, rebuild it
+                            userIdEl.innerHTML = `
+                                ${currentUser.uniqueId}
+                                <span class="copy-icon" data-testid="button-copy-id" onclick="copyUserId()" title="Copy ID">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M16 1H4C2.9 1 2 1.9 2 3V17H4V3H16V1ZM19 5H8C6.9 5 6 5.9 6 7V21C6 22.1 6.9 23 8 23H19C20.1 23 21 22.1 21 21V7C21 5.9 20.1 5 19 5ZM19 21H8V7H19V21Z"/>
+                                    </svg>
+                                </span>
+                            `;
+                        }
+                    }
+                    
+                    // Update View Profile button link
+                    const viewProfileBtn = document.getElementById('viewProfileBtn');
+                    if (viewProfileBtn && currentUser.uniqueId) {
+                        viewProfileBtn.href = `/profile/${currentUser.uniqueId}`;
+                    }
+                    
+                    // Update profile photo
+                    const profilePhoto = currentUser.profilePhoto || 'default';
+                    const photoElement = document.getElementById('currentProfilePhoto');
+                    if (profilePhoto.startsWith('custom-')) {
+                        // Custom uploaded photo
+                        photoElement.className = 'profile-photo custom-photo';
+                        photoElement.style.backgroundImage = `url('${profilePhoto.replace('custom-', '/uploads/')}')`;
+                    } else {
+                        // Default photo
+                        photoElement.className = `profile-photo ${profilePhoto}`;
+                        photoElement.style.backgroundImage = ''; // Clear inline style to use CSS class
+                    }
+                    photoElement.textContent = ''; // Clear any text
+                    selectedPhoto = profilePhoto;
+                    
+                    // Update progress bar
+                    const progress = parseFloat(currentUser.progress) || 0;
+                    const progressFillEl = document.getElementById('progressFill');
+                    if (progressFillEl) {
+                        progressFillEl.style.width = progress + '%';
+                    }
+                    const progressTextEl = document.getElementById('progressText');
+                    if (progressTextEl) {
+                        progressTextEl.textContent = progress.toFixed(1) + '% completed';
+                    }
+                    
+                    // Update new statistics
+                    updateTradingStats(currentUser);
+                    
+                    // Load global files and links
+                    loadGlobalFiles();
+                    loadGlobalLinks();
+                    loadMentorships();
+                    loadFavoritePairs();
+                    loadBiasEntries();
+                    
+                } else {
+                    // User not authenticated, redirect to auth
+                    window.location.href = '/auth?from=dashboard';
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+                window.location.href = '/auth?from=dashboard';
+            }
+        }
+
+        // Load global files (XSS-safe)
+        async function loadGlobalFiles() {
+            try {
+                const response = await fetch('/api/global-files');
+                if (response.ok) {
+                    const files = await response.json();
+                    const filesList = document.getElementById('usefulFiles');
+                    if (!filesList) {
+                        console.warn('usefulFiles container not found');
+                        return;
+                    }
+                    
+                    // Clear existing content
+                    filesList.innerHTML = '';
+                    
+                    if (files.length === 0) {
+                        const li = document.createElement('li');
+                        li.style.opacity = '0.5';
+                        li.style.textAlign = 'center';
+                        li.textContent = 'No files available';
+                        filesList.appendChild(li);
+                    } else {
+                        files.forEach(file => {
+                            const li = document.createElement('li');
+                            li.style.cursor = 'pointer';
+                            li.addEventListener('click', () => downloadFile(file.filename));
+                            
+                            // Create elegant white folder icon SVG (matching sidebar style)
+                            const iconSpan = document.createElement('span');
+                            iconSpan.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="white" style="margin-right: 0.5rem; vertical-align: middle; opacity: 0.9;"><path d="M10 4H4C2.89 4 2 4.89 2 6V18C2 19.11 2.89 20 4 20H20C21.11 20 22 19.11 22 18V8C22 6.89 21.11 6 20 6H12L10 4Z"/></svg>';
+                            li.appendChild(iconSpan);
+                            
+                            const titleText = document.createTextNode(file.title);
+                            li.appendChild(titleText);
+                            
+                            if (file.description) {
+                                const descDiv = document.createElement('div');
+                                descDiv.style.fontSize = '0.9em';
+                                descDiv.style.opacity = '0.7';
+                                descDiv.style.marginTop = '0.3rem';
+                                descDiv.textContent = file.description;
+                                li.appendChild(descDiv);
+                            }
+                            
+                            filesList.appendChild(li);
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading files:', error);
+                const filesList = document.getElementById('usefulFiles');
+                if (filesList) {
+                    filesList.innerHTML = '';
+                    const li = document.createElement('li');
+                    li.style.opacity = '0.5';
+                    li.style.textAlign = 'center';
+                    li.textContent = 'Error loading files';
+                    filesList.appendChild(li);
+                }
+            }
+        }
+
+        // Load global links (XSS-safe)
+        async function loadGlobalLinks() {
+            try {
+                const response = await fetch('/api/global-links');
+                if (response.ok) {
+                    const links = await response.json();
+                    const linksList = document.getElementById('linksList');
+                    if (!linksList) {
+                        console.warn('linksList container not found');
+                        return;
+                    }
+                    
+                    // Clear existing content
+                    linksList.innerHTML = '';
+                    
+                    if (links.length === 0) {
+                        const div = document.createElement('div');
+                        div.style.opacity = '0.5';
+                        div.style.textAlign = 'center';
+                        div.style.padding = '1rem';
+                        div.textContent = 'No links available';
+                        linksList.appendChild(div);
+                    } else {
+                        links.forEach(link => {
+                            const a = document.createElement('a');
+                            a.href = link.url;
+                            a.target = '_blank';
+                            a.className = 'link-item';
+                            
+                            const iconDiv = document.createElement('div');
+                            iconDiv.className = 'link-icon';
+                            iconDiv.textContent = '🔗';
+                            a.appendChild(iconDiv);
+                            
+                            const contentDiv = document.createElement('div');
+                            
+                            const titleDiv = document.createElement('div');
+                            titleDiv.textContent = link.title;
+                            contentDiv.appendChild(titleDiv);
+                            
+                            if (link.description) {
+                                const descDiv = document.createElement('div');
+                                descDiv.style.fontSize = '0.9em';
+                                descDiv.style.opacity = '0.7';
+                                descDiv.style.marginTop = '0.3rem';
+                                descDiv.textContent = link.description;
+                                contentDiv.appendChild(descDiv);
+                            }
+                            
+                            a.appendChild(contentDiv);
+                            linksList.appendChild(a);
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading links:', error);
+                const linksList = document.getElementById('linksList');
+                linksList.innerHTML = '';
+                const div = document.createElement('div');
+                div.style.opacity = '0.5';
+                div.style.textAlign = 'center';
+                div.style.padding = '1rem';
+                div.textContent = 'Error al cargar enlaces';
+                linksList.appendChild(div);
+            }
+        }
+
+        // Load mentorships function
+        async function loadMentorships() {
+            try {
+                const response = await fetch('/api/global-mentorships');
+                if (response.ok) {
+                    const mentorships = await response.json();
+                    const mentorshipContainer = document.getElementById('lastMentorshipVideo');
+                    
+                    if (mentorships.length === 0) {
+                        mentorshipContainer.innerHTML = `
+                            <div style="background: rgba(255,255,255,0.05); border-radius: 8px; padding: 2rem; margin: 1rem 0;">
+                                <div style="margin-bottom: 1rem;">
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="rgba(255,255,255,0.6)" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M17,10.5V7A1,1 0 0,0 16,6H4A1,1 0 0,0 3,7V17A1,1 0 0,0 4,18H16A1,1 0 0,0 17,17V13.5L21,17.5V6.5L17,10.5Z"/>
+                                    </svg>
+                                </div>
+                                <div style="font-weight: bold; margin-bottom: 0.5rem;">No mentorships available</div>
+                                <div style="font-size: 0.8rem; opacity: 0.7;">Videos are managed from the admin panel</div>
+                            </div>
+                        `;
+                    } else {
+                        // Show the most recent mentorship
+                        const latestMentorship = mentorships[mentorships.length - 1];
+                        
+                        // Create video preview/thumbnail
+                        let videoPreview = '';
+                        if (latestMentorship.type === 'youtube' && latestMentorship.youtubeUrl) {
+                            // Extract YouTube video ID for thumbnail
+                            const youtubeId = latestMentorship.youtubeUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/);
+                            if (youtubeId && youtubeId[1]) {
+                                videoPreview = `
+                                    <div style="position: relative; width: 100%; height: 90px; margin-bottom: 1rem; background: #000; border-radius: 6px; overflow: hidden; flex-shrink: 0;">
+                                        <img src="https://img.youtube.com/vi/${youtubeId[1]}/hqdefault.jpg" 
+                                             style="width: 100%; height: 100%; object-fit: cover; display: block;" 
+                                             alt="Video thumbnail" 
+                                             onload="this.style.opacity='1'" 
+                                             style="opacity: 0; transition: opacity 0.2s;" />
+                                        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; text-shadow: 0 0 10px rgba(0,0,0,0.8); pointer-events: none;">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M8 5V19L19 12L8 5Z"/>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                `;
+                            }
+                        } else if (latestMentorship.type === 'upload') {
+                            // For uploaded videos, show a generic video preview
+                            videoPreview = `
+                                <div style="position: relative; width: 100%; height: 90px; margin-bottom: 1rem; background: linear-gradient(135deg, #1e1e1e, #2a2a2a); border-radius: 6px; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="white" style="margin-right: 8px;">
+                                        <path d="M18,4V1H6V4H7V2H17V4H18ZM18,6H6A2,2 0 0,0 4,8V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8A2,2 0 0,0 18,6ZM17,17L14.5,15.5L12,17V11H17V17Z"/>
+                                    </svg>
+                                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; text-shadow: 0 0 10px rgba(0,0,0,0.8); pointer-events: none;">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M8 5V19L19 12L8 5Z"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                        
+                        mentorshipContainer.innerHTML = `
+                            <div style="background: rgba(255,255,255,0.05); border-radius: 8px; padding: 1rem; margin: 0.5rem 0; cursor: pointer;" 
+                                 onclick="playMentorship('${latestMentorship.id}', '${latestMentorship.type}', '${latestMentorship.youtubeUrl || ''}', '${latestMentorship.uploadedVideo || ''}')">
+                                ${videoPreview}
+                                <div style="font-weight: bold; margin-bottom: 0.5rem; font-size: 0.9rem;">${latestMentorship.title}</div>
+                                ${latestMentorship.description ? `<div style="font-size: 0.75rem; opacity: 0.7; margin-bottom: 0.5rem;">${latestMentorship.description}</div>` : ''}
+                                <div style="font-size: 0.7rem; opacity: 0.5;">${latestMentorship.type === 'youtube' ? 'YouTube' : 'Video'}</div>
+                            </div>
+                        `;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading mentorships:', error);
+                const mentorshipContainer = document.getElementById('lastMentorshipVideo');
+                mentorshipContainer.innerHTML = `
+                    <div style="background: rgba(255,255,255,0.05); border-radius: 8px; padding: 2rem; margin: 1rem 0;">
+                        <div style="margin-bottom: 1rem;">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="rgba(239,68,68,0.8)" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 2C6.48 2 2 6.48 2 12S6.48 22 12 22S22 17.52 22 12S17.52 2 12 2ZM13 17H11V15H13V17ZM13 13H11V7H13V13Z"/>
+                            </svg>
+                        </div>
+                        <div style="font-weight: bold; margin-bottom: 0.5rem;">Error loading mentorships</div>
+                        <div style="font-size: 0.8rem; opacity: 0.7;">Please try again later</div>
+                    </div>
+                `;
+            }
+        }
+
+        // Play mentorship function
+        function playMentorship(id, type, youtubeUrl, filename) {
+            if (type === 'youtube' && youtubeUrl) {
+                // Open YouTube video in new tab
+                window.open(youtubeUrl, '_blank');
+            } else if (type === 'upload' && filename) {
+                // Navigate to custom video player page
+                window.location.href = `/mentorship/${id}`;
+            } else {
+                alert('Cannot play this mentorship');
+            }
+        }
+
+        // Update "View more mentorships" button
+        function viewMoreMentorships() {
+            // Navigate to the mentorship catalog page
+            window.location.href = '/mentorship-catalog';
+        }
+        
+        async function showAllMentorshipsModal() {
+            try {
+                const response = await fetch('/api/global-mentorships');
+                if (response.ok) {
+                    const mentorships = await response.json();
+                    createMentorshipsModal(mentorships);
+                } else {
+                    alert('Error loading mentorships');
+                }
+            } catch (error) {
+                console.error('Error loading mentorships:', error);
+                alert('Connection error');
+            }
+        }
+        
+        function createMentorshipsModal(mentorships) {
+            // Remove existing modal if any
+            const existingModal = document.getElementById('allMentorshipsModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            const modal = document.createElement('div');
+            modal.id = 'allMentorshipsModal';
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                backdrop-filter: blur(10px);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 1000;
+            `;
+            
+            const modalContent = document.createElement('div');
+            modalContent.style.cssText = `
+                background: rgba(20, 20, 20, 0.95);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                border-radius: 16px;
+                padding: 2rem;
+                max-width: 80%;
+                max-height: 80%;
+                overflow-y: auto;
+                color: var(--color-text);
+            `;
+            
+            let mentorshipsHtml = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h2 style="margin: 0; color: var(--color-title); font-family: 'TheGoodMonolith', monospace;">All Mentorships</h2>
+                    <button onclick="closeAllMentorshipsModal()" style="
+                        background: rgba(255, 255, 255, 0.1);
+                        border: 1px solid rgba(255, 255, 255, 0.2);
+                        color: var(--color-text);
+                        padding: 0.5rem 1rem;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        font-family: 'TheGoodMonolith', monospace;
+                    " data-testid="button-close-mentorships-modal">✕ Close</button>
+                </div>
+            `;
+            
+            if (mentorships.length === 0) {
+                mentorshipsHtml += `
+                    <div style="text-align: center; padding: 3rem; opacity: 0.7;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">🎓</div>
+                        <div>No mentorships available</div>
+                    </div>
+                `;
+            } else {
+                mentorshipsHtml += `
+                    <div style="display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+                `;
+                
+                mentorships.forEach(mentorship => {
+                    const typeIcon = mentorship.type === 'youtube' ? '📺' : '🎥';
+                    const typeText = mentorship.type === 'youtube' ? 'YouTube' : 'Video';
+                    
+                    mentorshipsHtml += `
+                        <div style="
+                            background: rgba(30, 30, 30, 0.8);
+                            border: 1px solid rgba(255, 255, 255, 0.1);
+                            border-radius: 12px;
+                            padding: 1.5rem;
+                            transition: all 0.3s ease;
+                            cursor: pointer;
+                        " onclick="playMentorship(${mentorship.id})" 
+                        onmouseover="this.style.borderColor='var(--color-switch-active)'; this.style.transform='translateY(-2px)'"
+                        onmouseout="this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.transform='translateY(0)'"
+                        data-testid="mentorship-card-${mentorship.id}">
+                            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                                <div style="font-size: 2rem;">${typeIcon}</div>
+                                <div>
+                                    <h3 style="margin: 0 0 0.5rem 0; color: var(--color-title); font-family: 'TheGoodMonolith', monospace; font-size: 1.1rem;">
+                                        ${mentorship.title}
+                                    </h3>
+                                    <div style="font-size: 0.8rem; opacity: 0.7;">
+                                        ${typeText} • ${new Date(mentorship.createdAt).toLocaleDateString('es-ES')}
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="font-size: 0.9rem; opacity: 0.8; line-height: 1.4;">
+                                ${mentorship.description || 'No description available.'}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                mentorshipsHtml += `</div>`;
+            }
+            
+            modalContent.innerHTML = mentorshipsHtml;
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+            
+            // Close modal when clicking outside
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeAllMentorshipsModal();
+                }
+            });
+        }
+        
+        function closeAllMentorshipsModal() {
+            const modal = document.getElementById('allMentorshipsModal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        // Download file function
+        function downloadFile(filename) {
+            // Create a temporary link and trigger download
+            const link = document.createElement('a');
+            link.href = `/api/files/download/${encodeURIComponent(filename)}`;
+            link.download = filename;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Profile photo selector functions
+        function openPhotoSelector() {
+            const modal = document.getElementById('photoSelectorModal');
+            modal.style.display = 'flex';
+            
+            // Update selection in modal
+            document.querySelectorAll('.photo-option').forEach(option => {
+                option.classList.remove('selected');
+                if (option.dataset.photo === selectedPhoto) {
+                    option.classList.add('selected');
+                }
+            });
+        }
+
+        function closePhotoSelector() {
+            const photoSelectorModal = document.getElementById('photoSelectorModal');
+            if (photoSelectorModal) {
+                photoSelectorModal.style.display = 'none';
+            }
+        }
+
+        async function handleCustomPhotoUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Validate file type
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+            if (!allowedTypes.includes(file.type)) {
+                alert('Please select a valid image file (JPG, PNG, GIF)');
+                return;
+            }
+
+            // Validate file size (5MB max)
+            const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+            if (file.size > maxSize) {
+                alert('File is too large. Maximum size is 5MB.');
+                return;
+            }
+
+            try {
+                // Create FormData for upload
+                const formData = new FormData();
+                formData.append('profilePhoto', file);
+
+                // Upload the file
+                const uploadResponse = await fetch('/api/upload/profile-photo', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (uploadResponse.ok) {
+                    const result = await uploadResponse.json();
+                    selectedPhoto = `custom-${result.filename}`;
+                    customPhotoData = result.filePath;
+
+                    // Update selection UI
+                    document.querySelectorAll('.photo-option').forEach(option => {
+                        option.classList.remove('selected');
+                    });
+
+                    // Show success message
+                    alert('Photo uploaded successfully. Click "Save" to apply changes.');
+                } else {
+                    alert('Error uploading photo. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error uploading photo:', error);
+                alert('Error al subir la foto. Inténtalo de nuevo.');
+            }
+        }
+
+        async function saveProfilePhoto() {
+            try {
+                const response = await fetch('/api/user/me', {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        profilePhoto: selectedPhoto
+                    })
+                });
+
+                if (response.ok) {
+                    const updatedUser = await response.json();
+                    currentUser = updatedUser;
+                    
+                    // Update profile photo display
+                    const photoElement = document.getElementById('currentProfilePhoto');
+                    if (selectedPhoto.startsWith('custom-')) {
+                        // Custom uploaded photo
+                        photoElement.className = 'profile-photo custom-photo';
+                        photoElement.style.backgroundImage = `url('${selectedPhoto.replace('custom-', '/uploads/')}')`;
+                    } else {
+                        // Default photo
+                        photoElement.className = `profile-photo ${selectedPhoto}`;
+                        photoElement.style.backgroundImage = ''; // Clear inline style to use CSS class
+                    }
+                    photoElement.textContent = ''; // Clear any text
+                    
+                    closePhotoSelector();
+                } else {
+                    alert('Error al actualizar la foto de perfil');
+                }
+            } catch (error) {
+                console.error('Error saving profile photo:', error);
+                alert('Error al actualizar la foto de perfil');
+            }
+        }
+
+        // Copy user ID to clipboard
+        function copyUserId() {
+            if (!currentUser || !currentUser.uniqueId) {
+                console.error('No user ID to copy');
+                return;
+            }
+            
+            // Use the Clipboard API
+            navigator.clipboard.writeText(currentUser.uniqueId).then(() => {
+                // Show success feedback
+                const copyIcon = document.querySelector('.copy-icon');
+                if (copyIcon) {
+                    const originalTitle = copyIcon.title;
+                    copyIcon.title = '¡Copiado!';
+                    copyIcon.style.opacity = '1';
+                    copyIcon.style.color = '#22c55e';
+                    
+                    setTimeout(() => {
+                        copyIcon.title = originalTitle;
+                        copyIcon.style.opacity = '0.7';
+                        copyIcon.style.color = '';
+                    }, 2000);
+                }
+            }).catch(err => {
+                console.error('Error copying to clipboard:', err);
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = currentUser.uniqueId;
+                textArea.style.position = 'fixed';
+                textArea.style.opacity = '0';
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    alert('ID copiado al portapapeles');
+                } catch (err) {
+                    console.error('Fallback copy failed:', err);
+                    alert('No se pudo copiar el ID');
+                }
+                document.body.removeChild(textArea);
+            });
+        }
+        
+        // Logout function
+        async function logout() {
+            try {
+                const response = await fetch('/api/logout', {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    window.location.href = '/auth';
+                } else {
+                    console.error('Error logging out');
+                    // Force redirect anyway
+                    window.location.href = '/auth';
+                }
+            } catch (error) {
+                console.error('Error logging out:', error);
+                // Force redirect anyway
+                window.location.href = '/auth';
+            }
+        }
+
+        // Tab switching functionality
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all tab triggers
+            document.querySelectorAll('.tab-trigger').forEach(trigger => {
+                trigger.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName + '-tab').classList.add('active');
+            
+            // Set active tab trigger
+            event.target.classList.add('active');
+        }
+
+        // Fetch and update trading statistics from API
+        async function updateTradingStats() {
+            try {
+                const response = await fetch('/api/user/stats');
+                if (response.ok) {
+                    const stats = await response.json();
+                    
+                    // Total trades
+                    const totalTradesEl = document.getElementById('totalTrades');
+                    if (totalTradesEl) {
+                        totalTradesEl.textContent = stats.totalTrades;
+                    }
+                    
+                    // Win rate
+                    const winRateEl = document.getElementById('winRate');
+                    if (winRateEl) {
+                        winRateEl.textContent = stats.successRate.toFixed(1) + '%';
+                        // Update CSS class based on performance
+                        winRateEl.className = stats.successRate >= 50 ? 'mini-stat-value price-positive' : 'mini-stat-value price-negative';
+                    }
+                    
+                    // Monthly P&L
+                    const monthlyPLEl = document.getElementById('monthlyPL');
+                    if (monthlyPLEl) {
+                        const plValue = parseFloat(stats.monthlyPL);
+                        monthlyPLEl.textContent = plValue >= 0 ? `+$${stats.monthlyPL}` : `-$${Math.abs(plValue).toFixed(2)}`;
+                        monthlyPLEl.className = plValue >= 0 ? 'mini-stat-value price-positive' : 'mini-stat-value price-negative';
+                    }
+                    
+                    // Risk/Reward Ratio
+                    const riskRewardEl = document.getElementById('riskRewardRatio');
+                    if (riskRewardEl) {
+                        riskRewardEl.textContent = stats.riskRewardRatio;
+                    }
+                } else {
+                    console.error('Failed to fetch trading stats');
+                }
+            } catch (error) {
+                console.error('Error fetching trading stats:', error);
+            }
+        }
+
+        // Fetch and update Discord account information
+        async function updateDiscordAccount() {
+            try {
+                const response = await fetch('/api/user/discord');
+                if (response.ok) {
+                    const discordData = await response.json();
+                    const discordAccountEl = document.getElementById('discordAccount');
+                    
+                    if (discordAccountEl) {
+                        if (discordData.linked) {
+                            // Show linked Discord account
+                            discordAccountEl.innerHTML = `
+                                <div style="margin-bottom: 1rem; opacity: 0.7;">
+                                    <svg width="48" height="48" viewBox="0 0 24 24" fill="rgba(88, 101, 242, 0.8)" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M19.27 5.33C17.94 4.71 16.5 4.26 15 4A.09.09 0 0014.92 4.05C14.75 4.36 14.54 4.78 14.39 5.11C12.78 4.87 11.19 4.87 9.6 5.11C9.45 4.78 9.23 4.36 9.06 4.05A.09.09 0 008.98 4C7.48 4.26 6.04 4.71 4.71 5.33A.08.08 0 004.64 5.39C1.82 9.69 1.05 13.89 1.42 18.04C1.42 18.07 1.44 18.09 1.46 18.1C3.32 19.47 5.12 20.31 6.87 20.86A.09.09 0 006.96 20.83C7.37 20.28 7.74 19.69 8.06 19.06A.09.09 0 007.97 18.94C7.4 18.73 6.85 18.47 6.32 18.17A.09.09 0 006.31 18.02C6.42 17.94 6.53 17.85 6.64 17.76C6.66 17.74 6.69 17.74 6.71 17.75C10.39 19.44 14.61 19.44 18.25 17.75C18.27 17.74 18.3 17.74 18.32 17.76C18.43 17.85 18.54 17.94 18.65 18.02A.09.09 0 0018.64 18.17C18.11 18.47 17.56 18.73 16.99 18.94A.09.09 0 0016.9 19.06C17.22 19.69 17.59 20.28 18 20.83A.09.09 0 0018.09 20.86C19.84 20.31 21.64 19.47 23.5 18.1C23.52 18.09 23.54 18.07 23.54 18.04C23.97 13.23 22.85 9.07 19.35 5.39A.07.07 0 0019.27 5.33Z"/>
+                                    </svg>
+                                </div>
+                                <div style="font-weight: bold; margin-bottom: 0.5rem; color: rgba(88, 101, 242, 1);">${discordData.discordUsername}</div>
+                                <div style="font-size: 0.8rem; opacity: 0.7;">ID: ${discordData.discordId}</div>
+                                <div style="font-size: 0.8rem; opacity: 0.5; margin-top: 0.5rem;">Vinculado el ${new Date(discordData.linkedAt).toLocaleDateString('es-ES')}</div>
+                            `;
+                        } else {
+                            // Show not linked with Discord icon
+                            discordAccountEl.innerHTML = `
+                                <div style="margin-bottom: 1rem; opacity: 0.7;">
+                                    <svg width="48" height="48" viewBox="0 0 71 55" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M60.1045 4.8978C55.5792 2.8214 50.7265 1.2916 45.6527 0.41542C45.5603 0.39851 45.468 0.440769 45.4204 0.525289C44.7963 1.6353 44.105 3.0834 43.6209 4.2216C38.1637 3.4046 32.7345 3.4046 27.3892 4.2216C26.905 3.0581 26.1886 1.6353 25.5617 0.525289C25.5141 0.443589 25.4218 0.40133 25.3294 0.41542C20.2584 1.2888 15.4057 2.8186 10.8776 4.8978C10.8384 4.9147 10.8048 4.9429 10.7825 4.9795C1.57795 18.7309 -0.943561 32.1443 0.293408 45.3914C0.299005 45.4562 0.335386 45.5182 0.385761 45.5576C6.45866 50.0174 12.3413 52.7249 18.1147 54.5195C18.2071 54.5477 18.305 54.5139 18.3638 54.4378C19.7295 52.5728 20.9469 50.6063 21.9907 48.5383C22.0523 48.4172 21.9935 48.2735 21.8676 48.2256C19.9366 47.4931 18.0979 46.6 16.3292 45.5858C16.1893 45.5041 16.1781 45.304 16.3068 45.2082C16.679 44.9293 17.0513 44.6391 17.4067 44.3461C17.471 44.2926 17.5606 44.2813 17.6362 44.3151C29.2558 49.6202 41.8354 49.6202 53.3179 44.3151C53.3935 44.2785 53.4831 44.2898 53.5502 44.3433C53.9057 44.6363 54.2779 44.9293 54.6529 45.2082C54.7816 45.304 54.7732 45.5041 54.6333 45.5858C52.8646 46.6197 51.0259 47.4931 49.0921 48.2228C48.9662 48.2707 48.9102 48.4172 48.9718 48.5383C50.038 50.6034 51.2554 52.5699 52.5959 54.435C52.6519 54.5139 52.7526 54.5477 52.845 54.5195C58.6464 52.7249 64.529 50.0174 70.6019 45.5576C70.6551 45.5182 70.6887 45.459 70.6943 45.3942C72.1747 30.0791 68.2147 16.7757 60.1968 4.9823C60.1772 4.9429 60.1437 4.9147 60.1045 4.8978ZM23.7259 37.3253C20.2276 37.3253 17.3451 34.1136 17.3451 30.1693C17.3451 26.225 20.1717 23.0133 23.7259 23.0133C27.308 23.0133 30.1626 26.2532 30.1066 30.1693C30.1066 34.1136 27.28 37.3253 23.7259 37.3253ZM47.3178 37.3253C43.8196 37.3253 40.9371 34.1136 40.9371 30.1693C40.9371 26.225 43.7636 23.0133 47.3178 23.0133C50.9 23.0133 53.7545 26.2532 53.6986 30.1693C53.6986 34.1136 50.9 37.3253 47.3178 37.3253Z" fill="rgba(255,255,255,0.6)"/>
+                                    </svg>
+                                </div>
+                                <div style="font-weight: bold; margin-bottom: 0.5rem;">Not linked</div>
+                                <div style="font-size: 0.8rem; opacity: 0.7; margin-bottom: 0.5rem;">To link your account, use the /login command on Discord</div>
+                                <div class="discord-link-icon">
+                                    <a href="https://discord.gg/jm4thHfnCf" target="_blank" rel="noopener noreferrer" data-testid="link-discord-server" title="Join our Discord server">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M19.27 5.33C17.94 4.71 16.5 4.26 15 4A.09.09 0 0014.92 4.05C14.75 4.36 14.54 4.78 14.39 5.11C12.78 4.87 11.19 4.87 9.6 5.11C9.45 4.78 9.23 4.36 9.06 4.05A.09.09 0 008.98 4C7.48 4.26 6.04 4.71 4.71 5.33A.08.08 0 004.64 5.39C1.82 9.69 1.05 13.89 1.42 18.04C1.42 18.07 1.44 18.09 1.46 18.1C3.32 19.47 5.12 20.31 6.87 20.86A.09.09 0 006.96 20.83C7.37 20.28 7.74 19.69 8.06 19.06A.09.09 0 007.97 18.94C7.4 18.73 6.85 18.47 6.32 18.17A.09.09 0 006.31 18.02C6.42 17.94 6.53 17.85 6.64 17.76C6.66 17.74 6.69 17.74 6.71 17.75C10.39 19.44 14.61 19.44 18.25 17.75C18.27 17.74 18.3 17.74 18.32 17.76C18.43 17.85 18.54 17.94 18.65 18.02A.09.09 0 0018.64 18.17C18.11 18.47 17.56 18.73 16.99 18.94A.09.09 0 0016.9 19.06C17.22 19.69 17.59 20.28 18 20.83A.09.09 0 0018.09 20.86C19.84 20.31 21.64 19.47 23.5 18.1C23.52 18.09 23.54 18.07 23.54 18.04C23.97 13.23 22.85 9.07 19.35 5.39A.07.07 0 0019.27 5.33Z"/>
+                                        </svg>
+                                    </a>
+                                </div>
+                            `;
+                        }
+                    }
+                } else {
+                    console.error('Failed to fetch Discord account info');
+                }
+            } catch (error) {
+                console.error('Error fetching Discord account info:', error);
+            }
+        }
+
+        // Initialize dashboard data when page loads
+        async function initializeDashboard() {
+            await updateTradingStats();
+            await updateDiscordAccount();
+        }
+
+        // Call initialization when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDashboard();
+        });
+
+        // Load favorite pairs
+        function loadFavoritePairs() {
+            const pairsContainer = document.getElementById('favoritePairs');
+            if (!pairsContainer) {
+                console.warn('favoritePairs container not found');
+                return;
+            }
+            const pairs = ['EUR/USD', 'GBP/USD', 'USD/JPY', 'AUD/USD', 'USD/CAD'];
+            
+            pairsContainer.innerHTML = '';
+            
+            pairs.forEach(pair => {
+                const pairDiv = document.createElement('div');
+                pairDiv.style.display = 'flex';
+                pairDiv.style.justifyContent = 'space-between';
+                pairDiv.style.alignItems = 'center';
+                pairDiv.style.padding = '0.8rem';
+                pairDiv.style.margin = '0.5rem 0';
+                pairDiv.style.background = 'rgba(255, 255, 255, 0.05)';
+                pairDiv.style.borderRadius = '8px';
+                pairDiv.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+                
+                const pairName = document.createElement('span');
+                pairName.textContent = pair;
+                pairName.style.fontWeight = 'bold';
+                
+                const pairPerformance = document.createElement('span');
+                const randomPerformance = (Math.random() * 10 - 5).toFixed(2);
+                pairPerformance.textContent = (randomPerformance > 0 ? '+' : '') + randomPerformance + '%';
+                pairPerformance.style.color = randomPerformance > 0 ? '#4ade80' : '#ef4444';
+                pairPerformance.style.fontWeight = 'bold';
+                
+                pairDiv.appendChild(pairName);
+                pairDiv.appendChild(pairPerformance);
+                pairsContainer.appendChild(pairDiv);
+            });
+        }
+
+        // Helper function to check if user data has changed
+        function hasUserDataChanged(oldUser, newUser) {
+            return (
+                oldUser.uniqueId !== newUser.uniqueId ||
+                oldUser.progress !== newUser.progress ||
+                oldUser.profilePhoto !== newUser.profilePhoto ||
+                oldUser.email !== newUser.email
+            );
+        }
+
+        // Helper function to update user display without full page reload
+        function updateUserDisplay(user) {
+            // Update user email
+            const userEmailEl = document.getElementById('userEmail');
+            if (userEmailEl && userEmailEl.textContent !== user.email) {
+                userEmailEl.textContent = user.email;
+            }
+            
+            // Update user ID (preserve copy icon)
+            const userIdEl = document.getElementById('userId');
+            if (userIdEl) {
+                const textNode = userIdEl.firstChild;
+                if (textNode && textNode.nodeType === Node.TEXT_NODE && textNode.textContent.trim() !== user.uniqueId) {
+                    textNode.textContent = user.uniqueId + ' ';
+                }
+            }
+            
+            // Update profile photo
+            const profilePhoto = user.profilePhoto || 'default';
+            const photoElement = document.getElementById('currentProfilePhoto');
+            if (photoElement && selectedPhoto !== profilePhoto) {
+                if (profilePhoto.startsWith('custom-')) {
+                    photoElement.className = 'profile-photo custom-photo';
+                    photoElement.style.backgroundImage = `url('${profilePhoto.replace('custom-', '/uploads/')}')`;
+                } else {
+                    photoElement.className = `profile-photo ${profilePhoto}`;
+                    photoElement.style.backgroundImage = '';
+                }
+                photoElement.textContent = '';
+                selectedPhoto = profilePhoto;
+            }
+            
+            // Update progress bar
+            const progress = parseFloat(user.progress) || 0;
+            const progressFillEl = document.getElementById('progressFill');
+            if (progressFillEl) {
+                progressFillEl.style.width = progress + '%';
+            }
+            const progressTextEl = document.getElementById('progressText');
+            if (progressTextEl) {
+                progressTextEl.textContent = progress.toFixed(1) + '% completado';
+            }
+            
+            // Update trading statistics
+            updateTradingStats(user);
+        }
+
+        // Show data update notification
+        function showDataUpdateNotification() {
+            // Create notification element if it doesn't exist
+            let notification = document.getElementById('dataUpdateNotification');
+            if (!notification) {
+                notification = document.createElement('div');
+                notification.id = 'dataUpdateNotification';
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 80px;
+                    right: 20px;
+                    background: rgba(34, 197, 94, 0.9);
+                    color: white;
+                    padding: 0.75rem 1.5rem;
+                    border-radius: 8px;
+                    font-family: "TheGoodMonolith", monospace;
+                    font-size: 0.9rem;
+                    z-index: 1000;
+                    opacity: 0;
+                    transform: translateY(-20px);
+                    transition: all 0.3s ease;
+                    border: 1px solid rgba(34, 197, 94, 0.3);
+                    backdrop-filter: blur(10px);
+                `;
+                notification.textContent = '✅ Datos actualizados';
+                document.body.appendChild(notification);
+            }
+            
+            // Show notification
+            setTimeout(() => {
+                notification.style.opacity = '1';
+                notification.style.transform = 'translateY(0)';
+            }, 100);
+            
+            // Hide notification after 3 seconds
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateY(-20px)';
+            }, 3000);
+        }
+
+        // Initialize the dashboard
+        loadUserData();
+        loadMentorships();
+        
+        // Setup periodic data refresh to sync changes made from admin
+        setInterval(async function() {
+            try {
+                const response = await fetch('/api/user');
+                if (response.ok) {
+                    const latestUser = await response.json();
+                    
+                    // Check if user data has changed
+                    if (currentUser && hasUserDataChanged(currentUser, latestUser)) {
+                        console.log('User data changed, updating...');
+                        currentUser = latestUser;
+                        updateUserDisplay(latestUser);
+                        
+                        // Show a subtle notification that data was updated
+                        showDataUpdateNotification();
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking for user updates:', error);
+            }
+        }, 5000); // Check every 5 seconds
+
+        // Add click handlers for photo selection in modal
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('photo-option')) {
+                // Remove selection from all options
+                document.querySelectorAll('.photo-option').forEach(option => {
+                    option.classList.remove('selected');
+                });
+                
+                // Add selection to clicked option
+                e.target.classList.add('selected');
+                selectedPhoto = e.target.dataset.photo;
+            }
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('photoSelectorModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closePhotoSelector();
+            }
+        });
+
+        // === BIAS ENTRIES FUNCTIONS ===
+        
+        // Load bias entries for dashboard
+        async function loadBiasEntries() {
+            try {
+                const response = await fetch('/api/bias');
+                if (response.ok) {
+                    const bias = await response.json();
+                    displayBiasEntries(bias);
+                } else {
+                    console.error('Error loading bias entries');
+                    displayBiasError();
+                }
+            } catch (error) {
+                console.error('Error loading bias entries:', error);
+                displayBiasError();
+            }
+        }
+
+        // Display bias entries in dashboard
+        function displayBiasEntries(biasEntries) {
+            const biasContainer = document.getElementById('biasNewsFeed');
+            
+            if (!biasContainer) {
+                console.warn('Bias container not found');
+                return;
+            }
+
+            if (biasEntries.length === 0) {
+                biasContainer.innerHTML = `
+                    <div class="news-item">
+                        <div class="news-title" style="text-align: center; opacity: 0.5;">No daily bias recorded</div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Show only the first 3 most recent bias entries
+            const recentBias = biasEntries.slice(0, 3);
+            
+            const html = recentBias.map(bias => {
+                const timeAgo = getTimeAgoDashboard(new Date(bias.createdAt));
+                
+                return `
+                    <div class="news-item">
+                        <div class="news-title">${bias.bias}</div>
+                        <div class="news-time">${timeAgo}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            biasContainer.innerHTML = html;
+        }
+
+        // Calculate time ago for dashboard display
+        function getTimeAgoDashboard(date) {
+            const now = new Date();
+            const diff = now - date;
+            const minutes = Math.floor(diff / (1000 * 60));
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+            if (minutes < 60) {
+                return `${minutes} min ago`;
+            } else if (hours < 24) {
+                return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+            } else {
+                return `${days} day${days > 1 ? 's' : ''} ago`;
+            }
+        }
+
+        // Display error message for bias
+        function displayBiasError() {
+            const biasContainer = document.getElementById('biasNewsFeed');
+            if (biasContainer) {
+                biasContainer.innerHTML = `
+                    <div class="news-item">
+                        <div class="news-title" style="text-align: center; opacity: 0.5; color: #ff6b6b;">Error loading daily bias</div>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

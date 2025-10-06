@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATHENIUM - Login</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .auth-container {
+            display: flex;
+            min-height: 100vh;
+            background-color: var(--color-bg);
+        }
+        
+        .auth-form-section {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        
+        .auth-hero-section {
+            flex: 1;
+            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .auth-form {
+            background: rgba(20, 20, 20, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 3rem;
+            max-width: 400px;
+            width: 100%;
+        }
+        
+        .auth-form h2 {
+            font-family: "TheGoodMonolith", monospace;
+            color: var(--color-title);
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+        
+        .auth-form p {
+            color: var(--color-text);
+            text-align: center;
+            margin-bottom: 2rem;
+            opacity: 0.7;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            color: var(--color-text);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: var(--color-text);
+            font-family: "TheGoodMonolith", monospace;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--color-switch-active);
+            background: rgba(255, 255, 255, 0.08);
+        }
+        
+        .auth-button {
+            width: 100%;
+            padding: 1rem;
+            background: var(--color-switch-active);
+            color: var(--color-bg);
+            border: none;
+            border-radius: 8px;
+            font-family: "TheGoodMonolith", monospace;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+        
+        .auth-button:hover {
+            background: #ffffff;
+            transform: translateY(-2px);
+        }
+        
+        .auth-toggle {
+            text-align: center;
+            margin-top: 2rem;
+        }
+        
+        .auth-toggle a {
+            color: var(--color-switch-active);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .auth-toggle a:hover {
+            text-decoration: underline;
+        }
+        
+        .auth-hero-content {
+            text-align: center;
+            z-index: 2;
+            max-width: 500px;
+            padding: 2rem;
+        }
+        
+        .auth-hero h1 {
+            font-family: "TheGoodMonolith", monospace;
+            font-size: 3rem;
+            color: var(--color-title);
+            margin-bottom: 1rem;
+            letter-spacing: 2px;
+        }
+        
+        .auth-hero p {
+            color: var(--color-text);
+            font-size: 1.2rem;
+            line-height: 1.6;
+            opacity: 0.8;
+        }
+        
+        .error-message {
+            background: rgba(220, 38, 38, 0.1);
+            border: 1px solid rgba(220, 38, 38, 0.3);
+            color: #fca5a5;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        
+        .success-message {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #86efac;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .auth-container {
+                flex-direction: column;
+            }
+            
+            .auth-hero-section {
+                min-height: 40vh;
+            }
+            
+            .auth-form-section {
+                padding: 1rem;
+            }
+            
+            .auth-form {
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-form-section">
+            <div class="auth-form">
+                <div class="error-message" id="errorMessage"></div>
+                <div class="success-message" id="successMessage"></div>
+                
+                <!-- Login Form -->
+                <div id="loginForm">
+                    <h2>Welcome</h2>
+                    <p>Access your ATHENIUM account</p>
+                    
+                    <form id="loginFormElement">
+                        <div class="form-group">
+                            <label for="loginEmail">Email</label>
+                            <input type="email" id="loginEmail" name="email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="loginPassword">Password</label>
+                            <input type="password" id="loginPassword" name="password" required>
+                        </div>
+                        
+                        <button type="submit" class="auth-button">LOGIN</button>
+                    </form>
+                    
+                    <div class="auth-toggle">
+                        <span style="color: var(--color-text);">Don't have an account? </span>
+                        <a href="#" id="showRegister">Register here</a>
+                    </div>
+                </div>
+                
+                <!-- Register Form -->
+                <div id="registerForm" style="display: none;">
+                    <h2>Join</h2>
+                    <p>Create your ATHENIUM account</p>
+                    
+                    <form id="registerFormElement">
+                        <div class="form-group">
+                            <label for="registerEmail">Email</label>
+                            <input type="email" id="registerEmail" name="email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="registerPassword">Password</label>
+                            <input type="password" id="registerPassword" name="password" required minlength="6">
+                        </div>
+                        
+                        <button type="submit" class="auth-button">CREATE ACCOUNT</button>
+                    </form>
+                    
+                    <div class="auth-toggle">
+                        <span style="color: var(--color-text);">Already have an account? </span>
+                        <a href="#" id="showLogin">Login here</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="auth-hero-section">
+            <div class="auth-hero-content">
+                <h1>ATHENIUM</h1>
+                <p>Join the most successful trading community. Learn professional strategies, manage risks effectively, and achieve consistency in your trades.</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Toggle between login and register forms
+        document.getElementById('showRegister').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+            clearMessages();
+        });
+        
+        document.getElementById('showLogin').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+            clearMessages();
+        });
+        
+        // Handle login form submission
+        document.getElementById('loginFormElement').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const credentials = {
+                email: formData.get('email'),
+                password: formData.get('password')
+            };
+            
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(credentials)
+                });
+                
+                if (response.ok) {
+                    showSuccess('Welcome back!');
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 1000);
+                } else {
+                    const error = await response.json();
+                    showError(error.error || 'Login error');
+                }
+            } catch (error) {
+                showError('Connection error. Please try again.');
+            }
+        });
+        
+        // Handle register form submission
+        document.getElementById('registerFormElement').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const userData = {
+                email: formData.get('email'),
+                password: formData.get('password')
+            };
+            
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(userData)
+                });
+                
+                if (response.ok) {
+                    showSuccess('Account created successfully! Redirecting...');
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 1500);
+                } else {
+                    const error = await response.json();
+                    showError(error.error || 'Error creating account');
+                }
+            } catch (error) {
+                showError('Connection error. Please try again.');
+            }
+        });
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            const successDiv = document.getElementById('successMessage');
+            
+            successDiv.style.display = 'none';
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+        
+        function showSuccess(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            const successDiv = document.getElementById('successMessage');
+            
+            errorDiv.style.display = 'none';
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+        }
+        
+        function clearMessages() {
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
+        }
+        
+        // Check if user is already authenticated (only if not coming from dashboard)
+        const urlParams = new URLSearchParams(window.location.search);
+        const fromDashboard = urlParams.get('from') === 'dashboard';
+        
+        if (!fromDashboard) {
+            fetch('/api/user')
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = '/dashboard';
+                    }
+                })
+                .catch(() => {
+                    // User not authenticated, stay on auth page
+                });
+        }
+    </script>
+</body>
+</html>
