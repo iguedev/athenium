@@ -33,7 +33,7 @@ Esta guía te ayudará a deployar la aplicación ATHENIUM en Render u otros serv
    - **Build Command**: `./build.sh`
    - **Start Command**: `npm start`
    - **Environment**: Node
-   - **Node Version**: 20.19.3
+   - **Node Version**: 20 (Render usa automáticamente la última versión estable de Node 20.x)
 
 3. **Crea una base de datos PostgreSQL**:
    - Dashboard de Render → "New +" → "PostgreSQL"
@@ -106,6 +106,8 @@ El script `build.sh` realiza los siguientes pasos automáticamente:
 4. ✅ Inicializa las tablas de la base de datos
 5. ✅ Ejecuta migraciones si es necesario
 6. ✅ Prepara la aplicación para producción
+
+**Nota**: Render ejecuta `npm install` automáticamente antes de correr el build command. El script `build.sh` también lo ejecuta para asegurar que todas las dependencias estén instaladas en caso de que se use en otros entornos.
 
 ---
 
